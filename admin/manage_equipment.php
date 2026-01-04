@@ -7,13 +7,11 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Equipment & Print | Inventory</title>
+    <title>Admin Dashboard</title>
     
-    <!-- CSS Dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     
     <style>
         :root {
@@ -33,95 +31,208 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
             overflow-x: hidden;
         }
 
-        /* === Sidebar Styles === */
+        /* === Modern Sidebar Styles === */
         .sidebar {
             width: var(--sidebar-width);
             background: #ffffff;
             height: 100vh;
-            position: fixed; top: 0; left: 0;
-            display: flex; flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
             padding: 1.5rem;
             box-shadow: 4px 0 24px rgba(0,0,0,0.02);
             z-index: 1000;
         }
 
         .brand-logo {
-            display: flex; align-items: center; gap: 12px;
-            font-size: 1.25rem; font-weight: 700;
-            color: var(--primary-color); margin-bottom: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 2.5rem;
             padding: 0 0.5rem;
         }
+        
         .brand-logo i {
-            font-size: 1.5rem; background: rgba(78, 84, 200, 0.1);
-            padding: 8px; border-radius: 12px;
+            font-size: 1.5rem;
+            background: rgba(78, 84, 200, 0.1);
+            padding: 8px;
+            border-radius: 12px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
         }
 
         .nav-link {
-            display: flex; align-items: center; gap: 14px;
-            padding: 12px 16px; color: #64748b;
-            text-decoration: none; border-radius: 12px;
-            transition: all 0.3s ease; font-weight: 500; margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            color: #64748b;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
         }
-        .nav-link:hover { background-color: #f8fafc; color: var(--primary-color); transform: translateX(4px); }
+
+        .nav-link:hover {
+            background-color: #f8fafc;
+            color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
         .nav-link.active {
             background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
             color: #ffffff;
             box-shadow: 0 4px 12px rgba(78, 84, 200, 0.25);
         }
+        
+        .nav-link i {
+            font-size: 1.2rem;
+        }
+
+        /* User Profile Section in Sidebar */
+        .user-profile-card {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: auto; /* ดันไปล่างสุด */
+            border: 1px solid #e2e8f0;
+        }
+        
+        .user-avatar {
+            width: 40px; height: 40px;
+            background: #e0e7ff;
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-info h6 { margin: 0; font-size: 0.9rem; font-weight: 600; }
+        .user-info span { font-size: 0.75rem; color: #94a3b8; }
+        
+        .logout-btn {
+            color: #ef4444;
+            background: none;
+            border: none;
+            margin-left: auto;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+        .logout-btn:hover { background: #fee2e2; }
 
         /* === Main Content === */
         .main-content {
-            flex: 1; margin-left: var(--sidebar-width); padding: 2rem;
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
         }
 
-        .card-luxury {
-            background: #ffffff; border-radius: 20px;
-            padding: 2rem; border: none;
+        /* Dashboard Cards */
+        .stat-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: none;
             box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            transition: transform 0.3s;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
         }
-
-        /* Table Customization */
-        .table thead th {
-            background-color: #f9f9f9; color: #888;
-            font-weight: 600; font-size: 0.9rem; border-bottom: none; padding: 1rem;
-        }
-        .table tbody td {
-            padding: 1rem; vertical-align: middle;
-            border-bottom: 1px solid #f2f2f2; font-size: 0.95rem;
-        }
+        .stat-card:hover { transform: translateY(-5px); }
         
-        /* Buttons */
-        .btn-icon { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: none; transition: 0.2s; }
-        .btn-view { background: #eef2ff; color: #4338ca; }
-        .btn-view:hover { background: #4338ca; color: white; }
-        .btn-del { background: #fef2f2; color: #ef4444; }
-        .btn-del:hover { background: #ef4444; color: white; }
-
+        .stat-icon {
+            width: 50px; height: 50px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
         .btn-print-selected {
             background: #1e1e2d; color: #c5a47e;
             border: none; padding: 10px 20px; border-radius: 50px;
-            font-weight: 500; transition: all 0.3s;
-        }
-        .btn-print-selected:hover {
-            background: #2b2b40; color: #fff; transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        /* Checkbox Custom */
-        .form-check-input {
-            width: 1.3em; height: 1.3em; cursor: pointer;
-            border: 2px solid #ddd;
-        }
-        .form-check-input:checked {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
+            font-weight: 500; 
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Easing function ให้นุ่มนวล */
+            position: relative; overflow: hidden;
         }
         
-        /* DataTables Styling Override */
-        .dataTables_wrapper .dataTables_filter input { border-radius: 20px; border: 1px solid #e0e0e0; padding: 5px 15px; }
-        .page-link { border-radius: 50% !important; margin: 0 3px; border: none; color: var(--primary-color); }
-        .page-item.active .page-link { background-color: var(--primary-color); border-color: var(--primary-color); color: white; }
+        .btn-print-selected:hover {
+            background: #2b2b40; color: #fff; 
+            transform: translateY(-4px) scale(1.02); /* ลอยขึ้นและขยายนิดนึง */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15); /* เงาฟุ้งขึ้น */
+        }
+        
+        .btn-print-selected:active {
+            transform: translateY(2px) scale(0.95); /* กดยุบลงไปเหมือนสปริง */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
 
+        /* 2. ปุ่มเพิ่ม (Add New) */
+        .btn-add-new {
+            background: var(--primary-color); color: white; border: none;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-add-new:hover {
+            background: #4338ca; 
+            transform: translateY(-4px) rotate(2deg); /* หมุนนิดๆ ให้ดูขี้เล่น */
+            box-shadow: 0 8px 20px rgba(78, 84, 200, 0.3);
+        }
+        .btn-add-new:active {
+            transform: translateY(2px) scale(0.95);
+        }
+
+        /* 3. ปุ่มไอคอนเล็กๆ (View / Delete) */
+        .btn-icon { 
+            width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; 
+            border-radius: 8px; border: none; transition: all 0.2s ease;
+        }
+        
+        .btn-view { background: #eef2ff; color: #4338ca; }
+        .btn-view:hover { 
+            background: #4338ca; color: white; 
+            transform: scale(1.15) rotate(-10deg); /* ขยายและเอียงซ้าย */
+        }
+        .btn-view:active { transform: scale(0.9); }
+
+        .btn-del { background: #fef2f2; color: #ef4444; }
+        .btn-del:hover { 
+            background: #ef4444; color: white; 
+            transform: scale(1.15) rotate(10deg); /* ขยายและเอียงขวา */
+        }
+        .btn-del:active { transform: scale(0.9); }
+
+        .stat-pending .stat-icon { background: #fffbeb; color: #fff176; }
+        .stat-repairing .stat-icon { background: #eff6ff; color: #ff7043; }
+        .stat-completed .stat-icon { background: #f0fdf4; color: #8bc34a; }
+
+        /* Table Card */
+        .table-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
     </style>
 </head>
 <body>
@@ -133,7 +244,7 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
     <div class="main-content">
         
         <!-- Form สำหรับส่งค่าไปหน้า Print Multiple -->
-        <form action="print_multiple.php" method="POST" target="_blank" id="printForm">
+        <form action="../print.php" method="POST" target="_blank" id="printForm">
             
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>

@@ -1,5 +1,5 @@
 <?php
-require_once "../db_connect.php";
+require_once "db_connect.php";
 
 // เช็คว่ามีการเลือกมาไหม
 if (!isset($_POST['selected_ids']) || empty($_POST['selected_ids'])) {

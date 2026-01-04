@@ -4,9 +4,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
 <nav class="sidebar">
-    <div class="brand-logo">
-        <i class="bi bi-cpu-fill"></i>
-        <span>IT Service</span>
+    <div class="container">
+        <a class="navbar-brand" href="dashboard.php">
+            <img src="../logo/logo.png" alt="โลโก้" height="55" class="d-inline-block align-text-top me-2">
+            <span>ระบบแจ้งซ่อมอุปกรณ์ IT</span>
+        </a>
     </div>
 
     <ul class="nav-menu">

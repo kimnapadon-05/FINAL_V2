@@ -207,7 +207,7 @@ $result_latest = $conn->query($sql_latest);
 </head>
 <body>
 
-    <!-- Sidebar (Nav) -->
+    <!-- Sidebar -->
     <?php include 'sidebar.php'; ?>
 
     <!-- Main Content -->
@@ -217,10 +217,10 @@ $result_latest = $conn->query($sql_latest);
                 <h2 class="fw-bold m-0">Dashboard</h2>
                 <p class="text-muted">ยินดีต้อนรับกลับ, มาดูภาพรวมงานซ่อมกันเถอะ</p>
             </div>
-            <div class="text-end">
-                <span class="badge bg-white text-dark shadow-sm px-3 py-2 border">
-                    <i class="bi bi-calendar3 me-2"></i> <?php echo date('d M Y'); ?>
-                </span>
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small">
+                    <i class="bi bi-calendar-event me-2"></i> <?php echo date('d M Y'); ?>
+                </div>
             </div>
         </div>
 
