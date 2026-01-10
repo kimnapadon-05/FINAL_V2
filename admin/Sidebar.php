@@ -10,7 +10,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <span>ระบบแจ้งซ่อมอุปกรณ์ IT</span>
         </a>
     </div>
-
+    &emsp;
     <ul class="nav-menu">
         <li class="nav-item">
             <a href="dashboard.php" class="nav-link <?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
