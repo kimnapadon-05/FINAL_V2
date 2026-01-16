@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // --- 2. จัดการ QR Code ---
     // เก็บไว้ที่ ../qrcodes/ (ถอยออกไปที่ Root)
-    $qrDir = "../qrcodes/";
+    $qrDir = "/qrcodes/";
     if (!is_dir($qrDir)) mkdir($qrDir);
     
     // ตั้งชื่อไฟล์ QR ตาม Asset ID (QR_รหัส.png)
