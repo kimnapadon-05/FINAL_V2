@@ -251,9 +251,9 @@ $result = $conn->query($sql);
         </div>
 
         <div class="table-card">
-            <div class="card-header-custom">
-                <h5 class="card-title">รายการแจ้งซ่อมทั้งหมด</h5>
-                <button class="btn btn-outline-primary btn-sm rounded-pill px-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title fw-bold m-0">รายการแจ้งซ่อมทั้งหมด</h5>
+                <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="location.reload();">
                     <i class="bi bi-arrow-clockwise"></i> Refresh
                 </button>
             </div>
