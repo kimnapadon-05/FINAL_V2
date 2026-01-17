@@ -1,6 +1,6 @@
 <?php include 'includes/header.php'; ?>
 <?php 
-// รองรับการสแกนผ่าน URL
+// ส่วนรองรับการสแกนผ่าน URL
 $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) : '';
 ?>
 
@@ -139,7 +139,7 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
                                 <h2 class="h3 fw-bold text-primary mb-1">แบบฟอร์มแจ้งซ่อม</h2>
                                 <p class="text-muted small mb-0">กรุณากรอกข้อมูลหรือสแกน QR ที่อุปกรณ์</p>
                             </div>
-                            <!-- *** ปุ่มสแกน QR สำหรับ Auto-fill (เปิดกล้องอย่างเดียว) *** -->
+                            <!-- ปุ่มสแกน QR สำหรับ Auto-fill -->
                             <button type="button" class="btn btn-outline-primary rounded-pill px-3" onclick="startFormScan()">
                                 <i class="bi bi-qr-code"></i> สแกนอุปกรณ์
                             </button>
@@ -241,20 +241,17 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
                             <div class="mb-4">
                                 <i class="bi bi-qr-code-scan display-1 text-primary"></i>
                                 <h2 class="h3 fw-bold mt-3">ติดตามสถานะ</h2>
-                                <p class="text-muted">สแกน QR Code หรืออัปโหลดรูปเพื่อดูความคืบหน้า</p>
+                                <p class="text-muted">สแกน QR Code ติดตามงานซ่อม</p>
                             </div>
                             
-                            <!-- *** แยกปุ่ม: เปิดกล้อง กับ อัปโหลดรูป ออกจากกัน *** -->
+                            <!-- แยกปุ่ม -->
                             <div class="d-grid gap-3 col-md-8 mx-auto">
-                                
-                                <!-- ปุ่ม 1: เปิดกล้อง (จะเปิด Modal กล้อง) -->
                                 <button id="trackScanBtn" class="btn btn-primary btn-lg rounded-pill shadow-sm" onclick="startTrackScan()">
                                     <i class="bi bi-camera-fill me-2"></i> เปิดกล้องสแกน
                                 </button>
                                 
                                 <div class="text-muted my-1 small">- หรือ -</div>
                                 
-                                <!-- ปุ่ม 2: อัปโหลดรูป (Trigger Input File) -->
                                 <input type="file" id="trackQrInput" accept="image/*" style="display:none;" onchange="handleTrackFileUpload(this)">
                                 <button onclick="document.getElementById('trackQrInput').click()" class="btn btn-outline-primary btn-lg rounded-pill">
                                     <i class="bi bi-image me-2"></i> อัปโหลดรูป QR Code
@@ -356,7 +353,7 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
             });
         }
 
-        // --- ส่วน Scanner Logic ---
+        // --- 2. Scanner Logic (แก้ไขการ Parsing Text ให้ฉลาดขึ้น) ---
         let html5QrCode = null;
         let scanMode = null; 
         
@@ -374,7 +371,7 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
             scanMode = mode;
             statusModal.classList.add('show');
             readerDiv.style.display = 'block';
-            scanControls.style.display = 'block'; // โชว์ปุ่มยกเลิก
+            scanControls.style.display = 'block'; 
             modalBody.innerHTML = '';
             
             // เช็ค HTTPS
@@ -395,12 +392,11 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
             }
         };
 
-        // ฟังก์ชันจัดการการอัปโหลดไฟล์ (เฉพาะโหมดติดตามสถานะ)
+        // ฟังก์ชันจัดการการอัปโหลดไฟล์ใน Modal
         window.handleTrackFileUpload = function(input) {
             if (input.files.length == 0) return;
             const imageFile = input.files[0];
             
-            // ใช้ Modal เดิมในการแสดงสถานะการสแกนรูป
             scanMode = 'track'; // บังคับโหมดติดตาม
             statusModal.classList.add('show');
             readerDiv.style.display = 'none'; 
@@ -408,7 +404,6 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
             modalBody.innerHTML = '<div class="text-center p-3"><div class="spinner-border text-primary"></div><p class="mt-2">กำลังสแกนรูปภาพ...</p></div>';
 
             if (html5QrCode) {
-                // หยุดกล้องก่อนสแกนไฟล์ (เผื่อเปิดอยู่)
                 if (html5QrCode.isScanning) {
                     html5QrCode.stop().catch(err => console.log(err));
                 }
@@ -425,7 +420,6 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
                     </div>`;
                 });
             }
-            // รีเซ็ต input เพื่อให้เลือกรูปเดิมซ้ำได้
             input.value = '';
         };
 
@@ -435,17 +429,32 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
                     readerDiv.style.display = 'none';
                 }).catch(err => console.log(err));
             }
-            
             scanControls.style.display = 'none';
 
-            let id = decodedText;
-            if (decodedText.includes('asset_id=')) {
-                try { id = decodedText.split('asset_id=')[1].split('&')[0]; } catch(e){}
-            } else if (decodedText.includes('tracking_id=')) {
-                try { id = decodedText.split('tracking_id=')[1].split('&')[0]; } catch(e){}
+            // *** ส่วนการแกะรหัส QR Code (Parsing) ***
+            let id = decodedText.trim();
+
+            console.log("Original Scanned:", id);
+
+            // 1. กรณีเป็น Text Format: "IT|AssetID|..." (ตัวพิมพ์ใหญ่/เล็ก ก็ได้)
+            if (id.toUpperCase().startsWith("IT|")) {
+                const parts = id.split("|");
+                // รูปแบบ IT|AssetID|Type|Serial|Name|Location
+                // เราต้องการ AssetID ซึ่งอยู่ตำแหน่งที่ 1 (index 1)
+                if (parts.length >= 2) {
+                    id = parts[1]; 
+                }
+            } 
+            // 2. กรณีเป็น URL (asset_id หรือ tracking_id)
+            else if (id.includes('asset_id=')) {
+                try { id = id.split('asset_id=')[1].split('&')[0]; } catch(e){}
+            } else if (id.includes('tracking_id=')) {
+                try { id = id.split('tracking_id=')[1].split('&')[0]; } catch(e){}
             }
 
-            console.log("Scanned ID:", id, "Mode:", scanMode);
+            console.log("Parsed ID:", id, "Mode:", scanMode);
+            
+            // alert("Debug: Scanned ID = " + id); // เปิดบรรทัดนี้ถ้าต้องการดูค่า ID
 
             if (scanMode === 'form') {
                 fetchEquipmentData(id);
@@ -475,6 +484,7 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
                         
                         if (data.image_path) {
                             let imgPath = data.image_path;
+                            // ปรับ path ถ้าจำเป็น
                             if(!imgPath.startsWith('admin/') && !imgPath.startsWith('http')) {
                                 imgPath = 'admin/' + imgPath; 
                             }
@@ -491,6 +501,7 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
                         const deviceSelect = document.getElementById('deviceTypeSelect');
                         if(deviceSelect) deviceSelect.value = mappedType;
 
+                        // Auto Select Building
                         if (data.location.includes("14")) buildingSelect.value = "ตึก 14";
                         else if (data.location.includes("26")) buildingSelect.value = "ตึก 26";
                         else buildingSelect.value = "Other";
@@ -514,10 +525,27 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
                     }
                 })
                 .catch(err => {
-                    detailText.innerHTML = `<span class="text-danger">เกิดข้อผิดพลาดในการดึงข้อมูล</span>`;
+                    detailText.innerHTML = `<span class="text-danger">เกิดข้อผิดพลาดในการดึงข้อมูล (API Error)</span>`;
+                    console.error(err);
                 });
         }
 
+        window.fetchStatus = function(trackingId) {
+            modalBody.innerHTML = `<div class="text-center p-5"><div class="spinner-border text-primary"></div><p>กำลังโหลด...</p></div>`;
+            readerDiv.style.display = 'none'; 
+            scanControls.style.display = 'none';
+
+            fetch('get_status.php?id=' + trackingId)
+                .then(response => response.text())
+                .then(html => {
+                    modalBody.innerHTML = html;
+                    const homeBtn = modalBody.querySelector('button[onclick="resetScanner()"]');
+                    if(homeBtn) {
+                        homeBtn.setAttribute('onclick', 'closeModal()');
+                        homeBtn.innerHTML = 'ปิดหน้าต่าง';
+                    }
+                });
+        };
         window.fetchStatus = function(trackingId) {
             modalBody.innerHTML = `<div class="text-center p-5"><div class="spinner-border text-primary"></div><p>กำลังโหลด...</p></div>`;
             readerDiv.style.display = 'none'; // ซ่อนกล้อง
