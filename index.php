@@ -199,8 +199,10 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
                                     <label class="form-label">ชื่อรุ่น / Model</label>
                                     <input type="text" class="form-control bg-light" name="device_model" id="deviceModelInput" placeholder="เช่น Lenovo ThinkPad" readonly>
                                 </div>
+    
+                            </div>
                                 
-                                <div class="col-md-6">
+                                <!--div class="col-md-6">
                                     <label class="form-label">ตึก <span class="text-danger">*</span></label>
                                     <select class="form-select" id="buildingSelect" name="building" required>
                                         <option value="">-- เลือกตึก --</option>
@@ -208,14 +210,14 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
                                         <option value="ตึก 26">ตึก 26</option>
                                         <option value="Other">ตึกอื่นๆ</option>
                                     </select>
-                                </div>
-                                <div class="col-md-6" id="roomDropdownContainer" style="display: none;">
+                                </div-->
+                                <!--div class="col-md-6" id="roomDropdownContainer" style="display: none;">
                                     <label class="form-label">ห้อง</label>
                                     <select class="form-select" id="roomSelect" name="room">
                                         <option value="">-- เลือกห้อง --</option>
                                     </select>
                                 </div>
-                            </div>
+                            </div-->
 
                             <div class="mb-3">
                                 <label class="form-label">รายละเอียดปัญหา <span class="text-danger">*</span></label>
@@ -423,6 +425,7 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
             input.value = '';
         };
 
+        // ฟังก์ชันเมื่อสแกนสำเร็จ
         const onScanSuccess = (decodedText) => {
             if (html5QrCode && html5QrCode.isScanning) {
                 html5QrCode.stop().then(() => {
@@ -431,30 +434,27 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
             }
             scanControls.style.display = 'none';
 
-            // *** ส่วนการแกะรหัส QR Code (Parsing) ***
             let id = decodedText.trim();
+            console.log("Original Text:", id);
 
-            console.log("Original Scanned:", id);
-
-            // 1. กรณีเป็น Text Format: "IT|AssetID|..." (ตัวพิมพ์ใหญ่/เล็ก ก็ได้)
+            // 1. ถ้าเจอรูปแบบ Text: IT|2200...
             if (id.toUpperCase().startsWith("IT|")) {
                 const parts = id.split("|");
-                // รูปแบบ IT|AssetID|Type|Serial|Name|Location
-                // เราต้องการ AssetID ซึ่งอยู่ตำแหน่งที่ 1 (index 1)
+                // รูปแบบ: IT | AssetID | Type | Serial | Name | Location
                 if (parts.length >= 2) {
-                    id = parts[1]; 
+                    id = parts[1]; // เอาตัวที่ 2 คือ Asset ID
                 }
             } 
-            // 2. กรณีเป็น URL (asset_id หรือ tracking_id)
+            // 2. ถ้าเจอ URL: index.php?asset_id=...
             else if (id.includes('asset_id=')) {
                 try { id = id.split('asset_id=')[1].split('&')[0]; } catch(e){}
-            } else if (id.includes('tracking_id=')) {
+            } 
+            // 3. ถ้าเจอ URL: track.php?tracking_id=...
+            else if (id.includes('tracking_id=')) {
                 try { id = id.split('tracking_id=')[1].split('&')[0]; } catch(e){}
             }
 
             console.log("Parsed ID:", id, "Mode:", scanMode);
-            
-            // alert("Debug: Scanned ID = " + id); // เปิดบรรทัดนี้ถ้าต้องการดูค่า ID
 
             if (scanMode === 'form') {
                 fetchEquipmentData(id);
