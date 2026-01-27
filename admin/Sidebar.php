@@ -1,6 +1,13 @@
 <?php
 // หาชื่อไฟล์ปัจจุบัน เพื่อทำปุ่ม Active (สีม่วงๆ)
 $current_page = basename($_SERVER['PHP_SELF']);
+
+// ป้องกันการเก็บแคชของหน้า admin เพื่อให้การกลับมาจะแสดงการตรวจสอบ session ใหม่
+header("Expires: Tue, 01 Jan 2000 00:00:00 GMT");
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 ?>
 
 <style>
@@ -163,3 +170,30 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </a>
     </div>
 </nav>
+<script>
+// ถ้าผู้ใช้คลิกลิงก์ที่จะออกจากโฟลเดอร์ /admin ให้เรียก logout โดยใช้ sendBeacon
+document.addEventListener('click', function(e) {
+    var a = e.target.closest && e.target.closest('a');
+    if (!a) return;
+    var href = a.getAttribute('href') || '';
+    // ข้ามลิงก์ภายใน (เช่น # หรือ javascript:) และลิงก์ logout เอง
+    if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.includes('logout.php')) return;
+
+    try {
+        var url = new URL(href, location.href);
+        // ถ้าเป็นลิงก์ไปยังนอก /admin ให้ส่งคำขอ logout แบบ background
+        if (!url.pathname.includes('/admin/')) {
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon('logout.php');
+            } else {
+                // fall back: fire a synchronous XHR (not ideal but a fallback)
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'logout.php', false);
+                xhr.send(null);
+            }
+        }
+    } catch (err) {
+        // ignore URL parsing errors
+    }
+});
+</script>
