@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 19, 2026 at 08:21 PM
+-- Generation Time: Jan 27, 2026 at 04:54 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,26 @@ SET time_zone = "+00:00";
 --
 -- Database: `repair_system`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admins`
+--
+
+CREATE TABLE `admins` (
+  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admins`
+--
+
+INSERT INTO `admins` (`id`, `username`, `password_hash`, `created_at`) VALUES
+(9, 'admin', '$2y$10$gCOLE7jPpGKmBdjqXDCIdeuA00LV88mDe6hSbafP/M4dIg69fWpiy', '2026-01-21 01:26:13');
 
 -- --------------------------------------------------------
 
@@ -90,11 +110,21 @@ INSERT INTO `requests` (`id`, `tracking_id`, `status`, `reported_by`, `reporter_
 (19, 'REP-20260118-340', 'รอรับเรื่อง', 'นาธาน บุญสุภาพ', NULL, '67319090009', '0991039926', '67319090009@lbtech.ac.th', 'Computer', NULL, NULL, NULL, 'ตึก 14', '1425', 'ปัญหาในอนาคต', 'uploads/REP-20260118-340.jpg', '2026-01-18 21:07:41', NULL, NULL, NULL),
 (20, 'REP-20260118-136', 'กำลังซ่อม', 'นภดล สอนเจตน์', NULL, '67319090008', '0962863480', '67319090008@lbtech.ac.th', 'Computer', NULL, NULL, NULL, 'ตึก 26', 'TC203', 'ฟหกวสดืกานห่สดิ้หก่า้ิยรานสฟ้ืดาฟกวหดื', 'uploads/REP-20260118-136.jpg', '2026-01-18 21:20:58', '2026-01-18 21:29:58', '2026-01-18 21:29:58', NULL),
 (21, 'REP-20260118-993', 'รอรับเรื่อง', 'นาธาน บุญสุภาพ', NULL, '67319090009', '0991039926', '67319090009@lbtech.ac.th', 'Computer', NULL, NULL, NULL, 'ตึก 14', '1415', 'หน้าจอเปิดไม่ติด', 'uploads/REP-20260118-993.png', '2026-01-18 21:38:40', NULL, NULL, NULL),
-(22, 'REP-20260119-655', 'รอรับเรื่อง', 'นภดล สอนเจตน์', '6731909008', '22005-02', '0962863480', '67319090008@lbtech.ac.th', 'AccessPoint', ' UBIQUITI UniFi (U7-Lite) Wireless BE5000', 'PF16DC85', 'COM-02', 'ตึก 26', 'TC203', 'เชื่อมต่อไม่ได้', 'uploads/REP-20260119-655.jpg', '2026-01-20 02:11:59', NULL, NULL, NULL);
+(22, 'REP-20260119-655', 'เสร็จสิ้น', 'นภดล สอนเจตน์', '6731909008', '22005-02', '0962863480', '67319090008@lbtech.ac.th', 'AccessPoint', ' UBIQUITI UniFi (U7-Lite) Wireless BE5000', 'PF16DC85', 'COM-02', 'ตึก 26', 'TC203', 'เชื่อมต่อไม่ได้', 'uploads/REP-20260119-655.jpg', '2026-01-20 02:11:59', '2026-01-26 22:09:07', NULL, '2026-01-26 22:09:07'),
+(23, 'REP-20260126-881', 'รอรับเรื่อง', 'นาธาน บุญสุภาพ', '67319090009', '', '0991039926', '67319090009@lbtech.ac.th', 'Computer', '', '', '', 'ตึก 14', '1415', 'คอมเปิดไม่ติด', 'uploads/REP-20260126-881.jpg', '2026-01-26 21:55:36', NULL, NULL, NULL),
+(24, 'REP-20260127-825', 'กำลังซ่อม', 'นภดล สอนเจตน์', '67319090008', '', '0962863480', '67319090008@lbtech.ac.th', 'AccessPoint', '', '', '', 'ตึก 26', 'TC303', 'เชื่อมต่อไม่ได้', 'uploads/REP-20260127-825.jpg', '2026-01-27 10:02:15', '2026-01-27 10:26:31', '2026-01-27 10:26:31', '2026-01-27 10:21:04'),
+(25, 'REP-20260127-685', 'เสร็จสิ้น', 'นาธาน บุญสุภาพ', '67319090009', '', '0991039926', '67319090009@lbtech.ac.th', 'Computer', '', '', '', 'ตึก 14', '1425', 'จอดำ, มดขึ้น, น้ำเปียก, ฝุ่นเครอะ', 'uploads/REP-20260127-685.jpg', '2026-01-27 10:21:00', '2026-01-27 10:52:14', '2026-01-27 10:52:08', '2026-01-27 10:52:14');
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `admins`
+--
+ALTER TABLE `admins`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`);
 
 --
 -- Indexes for table `equipment`
@@ -113,6 +143,12 @@ ALTER TABLE `requests`
 --
 
 --
+-- AUTO_INCREMENT for table `admins`
+--
+ALTER TABLE `admins`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
 -- AUTO_INCREMENT for table `equipment`
 --
 ALTER TABLE `equipment`
@@ -122,7 +158,7 @@ ALTER TABLE `equipment`
 -- AUTO_INCREMENT for table `requests`
 --
 ALTER TABLE `requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
