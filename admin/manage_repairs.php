@@ -13,9 +13,9 @@ include '../db_connect.php';
 
 // --- เรียกใช้ PHPMailer ---
 // ตรวจสอบ Path ให้ถูกต้อง (สมมติว่าคุณเก็บไว้ใน includes/PHPMailer/src/)
-require '../includes/PHPMailer/src/Exception.php';
-require '../includes/PHPMailer/src/PHPMailer.php';
-require '../includes/PHPMailer/src/SMTP.php';
+require '../includes/PHPmailer/src/Exception.php';
+require '../includes/PHPmailer/src/PHPMailer.php';
+require '../includes/PHPmailer/src/SMTP.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
