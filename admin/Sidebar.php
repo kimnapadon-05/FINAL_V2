@@ -8,6 +8,29 @@ header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
+
+// --- Session timeout handling (inactive users will be logged out) ---
+$session_timeout = 1800; // เวลาเป็นวินาที (ตัวอย่าง: 1800 = 30 นาที)
+// ให้พยายามตั้งค่า session lifetime ก่อนเริ่ม session หากยังไม่เริ่ม
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    ini_set('session.gc_maxlifetime', $session_timeout);
+    session_set_cookie_params($session_timeout);
+    session_start();
+} else {
+    // session อาจถูกเริ่มในไฟล์อื่นแล้ว
+}
+
+// ตรวจสอบกิจกรรมล่าสุด ถ้านานเกิน timeout ให้ทำลาย session และบังคับไปหน้า logout
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > $session_timeout)) {
+    // ตั้ง cookie แจ้งเตือนแบบชั่วคราว เพื่อให้หน้า Dashboard แสดงข้อความว่า session หมดอายุ
+    setcookie('session_expired', '1', time() + 300, '/'); // คงค่าสำหรับ 5 นาที
+    session_unset();
+    session_destroy();
+    header("Location: logout.php?timeout=1");
+    exit();
+}
+// อัปเดตเวลากิจกรรมล่าสุด
+$_SESSION['LAST_ACTIVITY'] = time();
 ?>
 
 <style>
