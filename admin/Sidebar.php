@@ -1,36 +1,6 @@
 <?php
 // หาชื่อไฟล์ปัจจุบัน เพื่อทำปุ่ม Active (สีม่วงๆ)
 $current_page = basename($_SERVER['PHP_SELF']);
-
-// ป้องกันการเก็บแคชของหน้า admin เพื่อให้การกลับมาจะแสดงการตรวจสอบ session ใหม่
-header("Expires: Tue, 01 Jan 2000 00:00:00 GMT");
-header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
-
-// --- Session timeout handling (inactive users will be logged out) ---
-$session_timeout = 1800; // เวลาเป็นวินาที (ตัวอย่าง: 1800 = 30 นาที)
-// ให้พยายามตั้งค่า session lifetime ก่อนเริ่ม session หากยังไม่เริ่ม
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    ini_set('session.gc_maxlifetime', $session_timeout);
-    session_set_cookie_params($session_timeout);
-    session_start();
-} else {
-    // session อาจถูกเริ่มในไฟล์อื่นแล้ว
-}
-
-// ตรวจสอบกิจกรรมล่าสุด ถ้านานเกิน timeout ให้ทำลาย session และบังคับไปหน้า logout
-if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > $session_timeout)) {
-    // ตั้ง cookie แจ้งเตือนแบบชั่วคราว เพื่อให้หน้า Dashboard แสดงข้อความว่า session หมดอายุ
-    setcookie('session_expired', '1', time() + 300, '/'); // คงค่าสำหรับ 5 นาที
-    session_unset();
-    session_destroy();
-    header("Location: logout.php?timeout=1");
-    exit();
-}
-// อัปเดตเวลากิจกรรมล่าสุด
-$_SESSION['LAST_ACTIVITY'] = time();
 ?>
 
 <style>
@@ -193,30 +163,3 @@ $_SESSION['LAST_ACTIVITY'] = time();
         </a>
     </div>
 </nav>
-<script>
-// ถ้าผู้ใช้คลิกลิงก์ที่จะออกจากโฟลเดอร์ /admin ให้เรียก logout โดยใช้ sendBeacon
-document.addEventListener('click', function(e) {
-    var a = e.target.closest && e.target.closest('a');
-    if (!a) return;
-    var href = a.getAttribute('href') || '';
-    // ข้ามลิงก์ภายใน (เช่น # หรือ javascript:) และลิงก์ logout เอง
-    if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.includes('logout.php')) return;
-
-    try {
-        var url = new URL(href, location.href);
-        // ถ้าเป็นลิงก์ไปยังนอก /admin ให้ส่งคำขอ logout แบบ background
-        if (!url.pathname.includes('/admin/')) {
-            if (navigator.sendBeacon) {
-                navigator.sendBeacon('logout.php');
-            } else {
-                // fall back: fire a synchronous XHR (not ideal but a fallback)
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', 'logout.php', false);
-                xhr.send(null);
-            }
-        }
-    } catch (err) {
-        // ignore URL parsing errors
-    }
-});
-</script>

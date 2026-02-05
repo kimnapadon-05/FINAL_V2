@@ -1,21 +1,15 @@
 <?php
 session_start();
 // ตรวจสอบสิทธิ์
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-if (!isset($_SESSION['admin_logged_in'])) {
-    header("Location: index.php");
-    exit();
-}
+if (!isset($_SESSION['admin_logged_in'])) { header("Location: index.php"); exit(); }
 
 include '../db_connect.php';
 
 // --- เรียกใช้ PHPMailer ---
 // ตรวจสอบ Path ให้ถูกต้อง (สมมติว่าคุณเก็บไว้ใน includes/PHPMailer/src/)
-require '../includes/PHPmailer/src/Exception.php';
-require '../includes/PHPmailer/src/PHPMailer.php';
-require '../includes/PHPmailer/src/SMTP.php';
+require '../includes/PHPMailer/src/Exception.php';
+require '../includes/PHPMailer/src/PHPMailer.php';
+require '../includes/PHPMailer/src/SMTP.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -146,7 +140,7 @@ $result = $conn->query($sql);
 </head>
 <body>
 
-        <?php include 'Sidebar.php'; ?>
+    <?php include 'sidebar.php'; ?>
 
     <div class="main-content">
         <div class="d-flex justify-content-between align-items-center mb-4">

@@ -102,7 +102,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
 <body>
 
     <!-- Sidebar (Nav) -->
-        <?php include 'Sidebar.php'; ?>
+    <?php include 'sidebar.php'; ?>
 
     <div class="main-content">
         
@@ -123,7 +123,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
                 <i class="bi bi-info-circle me-2"></i>ข้อมูลอุปกรณ์
             </h5>
             
-            <form action="generate_qr.php" method="POST" enctype="multipart/form-data">
+            <form action="/Project_Final/admin/generate_qr.php" method="POST" enctype="multipart/form-data">
                 <div class="row g-4">
                     <div class="col-md-6">
                         <label class="form-label">รหัสครุภัณฑ์ <span class="text-danger">*</span></label>

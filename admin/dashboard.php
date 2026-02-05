@@ -6,14 +6,6 @@ if (!isset($_SESSION['admin_logged_in'])) {
     exit();
 }
 
-// แสดงการแจ้งเตือนเมื่อ session หมดอายุ (cookie ถูกตั้งโดย Sidebar.php ก่อนทำ session_destroy())
-$show_session_timeout_alert = false;
-if (isset($_COOKIE['session_expired']) && $_COOKIE['session_expired'] == '1') {
-    $show_session_timeout_alert = true;
-    // ลบ cookie ทันทีเพื่อไม่ให้แสดงซ้ำ
-    setcookie('session_expired', '', time() - 3600, '/');
-}
-
 // เชื่อมต่อฐานข้อมูล
 include '../db_connect.php';
 
@@ -216,7 +208,7 @@ $result_latest = $conn->query($sql_latest);
 <body>
 
     <!-- Sidebar -->
-    <?php include 'Sidebar.php'; ?>
+    <?php include 'sidebar.php'; ?>
 
     <!-- Main Content -->
     <main class="main-content">
