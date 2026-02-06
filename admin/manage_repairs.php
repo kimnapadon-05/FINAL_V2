@@ -125,18 +125,7 @@ $result = $conn->query($sql);
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     
-    <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; }
-        .main-content { margin-left: 280px; padding: 2rem; min-height: 100vh; }
-        @media (max-width: 992px) { .main-content { margin-left: 0; } }
-        .table-card { background: #ffffff; border-radius: 20px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
-        .status-pill { padding: 6px 16px; border-radius: 50px; font-size: 0.85rem; font-weight: 500; display: inline-block; min-width: 100px; text-align: center; }
-        
-        .info-label { font-size: 0.85rem; color: #94a3b8; margin-bottom: 2px; }
-        .info-value { font-weight: 500; color: #334155; font-size: 0.95rem; }
-        .info-group { margin-bottom: 1rem; }
-        .section-header { font-size: 0.9rem; font-weight: 600; color: #4e54c8; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 

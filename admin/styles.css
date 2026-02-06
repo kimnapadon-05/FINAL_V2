@@ -1,0 +1,243 @@
+/* =========================================
+   1. Global Variables & Body
+   ========================================= */
+:root {
+    --sidebar-width: 280px;
+    --primary-color: #4e54c8;
+    --bg-color: #f3f4f6;
+    --text-color: #334155;
+}
+
+body { 
+    font-family: 'Kanit', sans-serif; 
+    background-color: var(--bg-color); 
+    color: var(--text-color);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* =========================================
+   2. Sidebar Styles
+   ========================================= */
+.sidebar {
+    width: var(--sidebar-width);
+    background: #ffffff;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.02);
+    z-index: 1050;
+    transition: left 0.3s ease;
+}
+
+/* ... (CSS ส่วนอื่นๆ คงเดิม) ... */
+
+.sidebar .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+    margin-bottom: 2rem;
+}
+
+.nav-menu { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
+.nav-item { margin-bottom: 0.5rem; }
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    color: #64748b;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+.nav-link:hover { background-color: #f8fafc; color: var(--primary-color); transform: translateX(4px); }
+.nav-link.active { background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%); color: #ffffff; box-shadow: 0 4px 12px rgba(78, 84, 200, 0.25); }
+.nav-link i { font-size: 1.2rem; }
+
+.user-profile-card {
+    background: #f8fafc; padding: 12px; border-radius: 16px; 
+    display: flex; align-items: center; gap: 12px; margin-top: auto; border: 1px solid #e2e8f0;
+}
+.user-avatar { width: 40px; height: 40px; background: #e0e7ff; color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+.user-info h6 { margin: 0; font-size: 0.9rem; font-weight: 600; color: #334155; }
+.user-info span { font-size: 0.75rem; color: #94a3b8; }
+.logout-btn { color: #ef4444; background: none; border: none; margin-left: auto; cursor: pointer; padding: 5px; border-radius: 8px; transition: 0.2s; font-size: 1.2rem; }
+.logout-btn:hover { background: #fee2e2; }
+
+/* =========================================
+   3. Main Content & Responsive (จุดสำคัญ!)
+   ========================================= */
+.main-content {
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+    transition: margin-left 0.3s ease;
+}
+
+/* Mobile View: หน้าจอเล็กกว่า 992px */
+@media (max-width: 992px) {
+    .sidebar {
+        /* บังคับซ่อนไปซ้ายสุดด้วย !important */
+        left: -280px !important; 
+    }
+    
+    .sidebar.show {
+        /* บังคับโชว์เมื่อกดปุ่ม */
+        left: 0 !important;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        padding: 1.5rem;
+    }
+    
+    .mobile-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: white;
+        padding: 10px 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        margin-bottom: 20px;
+    }
+    
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.5);
+        z-index: 1040;
+        backdrop-filter: blur(2px);
+    }
+    .sidebar-overlay.show { display: block; }
+}
+
+/* PC View: ซ่อนปุ่มเมนู */
+@media (min-width: 993px) {
+    .mobile-header, .sidebar-overlay { display: none; }
+}
+* รายการเมนู */
+    .nav-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-grow: 1;
+    }
+
+    .nav-item {
+        margin-bottom: 0.5rem;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 16px;
+        color: #64748b;
+        text-decoration: none;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        font-family: 'Kanit', sans-serif;
+    }
+
+    .nav-link:hover {
+        background-color: #f8fafc;
+        color: var(--primary-color);
+        transform: translateX(4px);
+    }
+
+    /* ปุ่มที่ถูกเลือก (Active) */
+    .nav-link.active {
+        background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(78, 84, 200, 0.25);
+    }
+    
+    .nav-link i { font-size: 1.2rem; }
+
+    /* ส่วน Profile ด้านล่าง */
+    .user-profile-card {
+        background: #f8fafc;
+        padding: 12px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: auto; 
+        border: 1px solid #e2e8f0;
+    }
+    
+    .user-avatar {
+        width: 40px; height: 40px;
+        background: #e0e7ff;
+        color: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+
+    .user-info h6 { margin: 0; font-size: 0.9rem; font-weight: 600; color: #334155; }
+    .user-info span { font-size: 0.75rem; color: #94a3b8; }
+    
+    .logout-btn {
+        color: #ef4444;
+        background: none;
+        border: none;
+        margin-left: auto;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 8px;
+        transition: 0.2s;
+        font-size: 1.2rem;
+    }
+    .logout-btn:hover { background: #fee2e2; }
+/* ... (CSS การ์ดและตารางเดิม ใช้ต่อได้เลย) ... */
+.stat-card { background: #ffffff; border-radius: 24px; padding: 1.5rem; border: none; box-shadow: 0 8px 16px rgba(0,0,0,0.02); transition: all 0.3s; height: 100%; }
+.stat-card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.05); }
+.stat-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 1.25rem; }
+.stat-pending .stat-icon { background: #fff9db; color: #f59f00; }
+.stat-repairing .stat-icon { background: #e7f5ff; color: #1c7ed6; }
+.stat-completed .stat-icon { background: #ebfbee; color: #37b24d; }
+.table-card { background: #ffffff; border-radius: 24px; padding: 1.5rem; box-shadow: 0 8px 16px rgba(0,0,0,0.02); overflow-x: auto; }
+.table thead th { background-color: #f8fafc; font-weight: 600; color: #64748b; text-transform: uppercase; font-size: 0.75rem; padding: 1rem; }
+.status-pill { padding: 6px 16px; border-radius: 50px; font-size: 0.85rem; font-weight: 500; display: inline-block; min-width: 100px; text-align: center; } 
+
+/* Hamburger Button สำหรับมือถือ */
+.navbar-toggler {
+    display: none; /* ซ่อนบน PC */
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1100; /* อยู่เหนือ Sidebar */
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+}
+
+/* Responsive สำหรับมือถือ (max-width: 768px คือ tablet/mobile) */
+@media (max-width: 768px) {
+    .navbar-toggler { display: block; } /* โชว์ button บนมือถือ */
+
+    .sidebar { left: -var(--sidebar-width); } /* ซ่อน Sidebar ไปทางซ้าย */
+
+    .sidebar.show { left: 0; } /* โชว์เมื่อเพิ่ม class 'show' */
+
+    .main-content { margin-left: 0 !important; } /* ลบ margin-left บนมือถือ เพื่อให้เนื้อหาเต็มจอ */
+}
