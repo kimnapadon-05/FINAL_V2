@@ -12,8 +12,8 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="styles.css">
+    
 </head>
 <body>
 
@@ -36,10 +36,6 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
                     <button type="submit" class="btn btn-print-selected shadow-sm">
                         <i class="bi bi-printer-fill me-2"></i> พิมพ์ที่เลือก
                     </button>
-                    <!-- ปุ่มเพิ่ม -->
-                    <!--a href="QR_code.php" class="btn btn-primary rounded-pill px-4 shadow-sm" style="background: var(--primary-color); border:none;">
-                        <i class="bi bi-plus-lg me-2"></i>เพิ่มอุปกรณ์
-                    </a-->
                 </div>
             </div>
 
@@ -53,7 +49,7 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
                                     <input class="form-check-input" type="checkbox" id="selectAll">
                                 </th>
                                 <th>รูปภาพ</th>
-                                <th>Asset ID</th>
+                                <th>เลขครุภัณฑ์</th>
                                 <th>ชื่ออุปกรณ์ / Model</th>
                                 <th>ประเภท</th>
                                 <th>Location</th>
@@ -119,7 +115,7 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
                 </div>
             </div>
         
-        </form> <!-- จบ Form -->
+        </form> 
 
     </div>
 

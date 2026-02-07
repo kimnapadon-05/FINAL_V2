@@ -35,16 +35,11 @@ $result_latest = $conn->query($sql_latest);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="styles.css">
+    
+    <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
-    <!-- Hamburger Button สำหรับมือถือ (โชว์เฉพาะจอเล็ก) -->
-    <button class="navbar-toggler" type="button">
-        <i class="bi bi-list fs-3"></i>
-    </button>
 
-    <!-- Sidebar -->
     <?php include 'Sidebar.php'; ?>
 
     <!-- Main Content -->
@@ -52,12 +47,10 @@ $result_latest = $conn->query($sql_latest);
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="fw-bold m-0">Dashboard</h2>
-                <p class="text-muted">ยินดีต้อนรับกลับ, มาดูภาพรวมงานซ่อมกันเถอะ</p>
+                <p class="text-muted">ภาพรวมของระบบแจ้งซ่อมอุปกรณ์ IT</p>
             </div>
-            <div class="d-flex align-items-center gap-3">
-                <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small">
-                    <i class="bi bi-calendar-event me-2"></i> <?php echo date('d M Y'); ?>
-                </div>
+            <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small text-nowrap">
+                <i class="bi bi-calendar-event me-2"></i> <?php echo date('d M Y'); ?>
             </div>
         </div>
 
@@ -133,19 +126,5 @@ $result_latest = $conn->query($sql_latest);
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // ใช้ optional chaining (?.) ป้องกัน error ถ้าไม่เจอ element
-        const toggler = document.querySelector('.navbar-toggler');
-        const sidebar = document.querySelector('.sidebar');
-
-        if (toggler && sidebar) {
-            toggler.addEventListener('click', () => {
-                sidebar.classList.toggle('show');
-                console.log('Sidebar toggled!'); // ใช้เช็คว่ากดได้ไหม
-            });
-        } else {
-            console.error('ไม่พบ .navbar-toggler หรือ .sidebar');
-        }
-    </script>                       
 </body>
 </html>
