@@ -7,144 +7,130 @@ include '../db_connect.php';
 
 // --- เรียกใช้ PHPMailer ---
 // ตรวจสอบ Path ให้ถูกต้อง (สมมติว่าคุณเก็บไว้ใน includes/PHPMailer/src/)
-require __DIR__ . '/includes/PHPMailer/src/Exception.php';
-require __DIR__ . '/includes/PHPMailer/src/PHPMailer.php';
-require __DIR__ . '/includes/PHPMailer/src/SMTP.php';
+require_once __DIR__ . '/../includes/PHPMailer/src/Exception.php';
+require_once __DIR__ . '/../includes/PHPMailer/src/PHPMailer.php';
+require_once __DIR__ . '/../includes/PHPMailer/src/SMTP.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 // --- ฟังก์ชันส่งอีเมลด้วย PHPMailer ---
-function sendEmailNotification($to, $name, $tracking_id, $device, $img = '') {
+function sendEmailNotification($to, $name, $tracking_id, $device, $img_path = '') {
     $mail = new PHPMailer(true);
 
     try {
-        // ตั้งค่า Server (SMTP)
+        // SMTP
         $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';  // ใช้ Gmail SMTP
+        $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = '67319090008@lbtech.ac.th'; // อีเมลผู้ส่ง
-        $mail->Password   = 'tkjb xped lwop vuzi'; // รหัสผ่านแอป (App Password) ของ Gmail
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // การเข้ารหัสแบบ TLS
-        $mail->Port       = 587; // TLS port
+        $mail->Username   = '67319090008@lbtech.ac.th';
+        $mail->Password   = 'tkjb xped lwop vuzi'; // password app Mail
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
 
-        // ตั้งค่าผู้รับ-ผู้ส่ง
-        $mail->setFrom('67319090008@lbtech.ac.th', 'IT Service Support');
-        $mail->addAddress($to, $name); // ผู้รับ
+        // ผู้ส่ง / ผู้รับ
+        $mail->setFrom('67319090008@lbtech.ac.th', 'ระบบเเจ้งซ่อมอุปกรณ์ IT');
+        $mail->addAddress($to, $name);
 
-        // ตั้งค่าเนื้อหา (รองรับภาษาไทย)
+        // Content
         $mail->CharSet = 'UTF-8';
         $mail->isHTML(true);
-        $mail->Subject = "แจ้งสถานะการซ่อม: เสร็จสิ้นเรียบร้อยแล้ว ($tracking_id)";
-        
-        $bodyContent = "
-        <div style='font-family: sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 10px; max-width: 600px;'>
-            <h2 style='color: #28a745;'>งานซ่อมเสร็จสิ้นแล้ว ✅</h2>
-            <p>เรียนคุณ <strong>$name</strong>,</p>
-            <p>งานแจ้งซ่อมของคุณ รหัส: <strong>$tracking_id</strong></p>
-            <p>อุปกรณ์: <strong>$device</strong></p>";
+        $mail->Subject = "แจ้งสถานะการซ่อม: เสร็จสิ้น ($tracking_id)";
 
-        // เพิ่มส่วนรูป ถ้ามี img_path
-        $cid = 'repair_image';  // ชื่อ CID ต้อง unique ในอีเมลนี้
+        $cid = 'repair_image';
+
+        $body = "
+        <div style='font-family:sans-serif;padding:20px'>
+            <h2 style='color:#28a745'>งานซ่อมเสร็จสิ้นแล้ว ✅</h2>
+            <p>เรียนคุณ <b>$name</b></p>
+            <p>รหัสงาน: <b>$tracking_id</b></p>
+            <p>อุปกรณ์: <b>$device</b></p>
+        ";
+
         if (!empty($img_path) && file_exists($img_path)) {
-            $bodyContent .= "
-            <p>รูปอุปกรณ์/ปัญหา:</p>
-            <p><img src='cid:$cid' alt='รูปอุปกรณ์' style='max-width:100%; height:auto; border-radius:8px;'></p>";
+            $body .= "
+            <p>รูปอุปกรณ์:</p>
+            <img src='cid:$cid' style='max-width:100%;border-radius:8px'>";
+            $mail->addEmbeddedImage($img_path, $cid, basename($img_path));
         }
 
-        $bodyContent .= "
+        $body .= "
             <hr>
-            <p>เจ้าหน้าที่ทำการซ่อมแก้ไขเรียบร้อยแล้วครับ สถานะปัจจุบันคือ <strong style='color:green'>เสร็จสิ้น</strong></p>
+            <p>สถานะปัจจุบัน: <b style='color:green'>เสร็จสิ้น</b></p>
             <p>คุณสามารถติดต่อรับอุปกรณ์คืนได้ที่แผนกเทคโนโลยีคอมพิวเตอร์ครับ</p>
-            <br>
-            <small style='color: #999;'>อีเมลนี้เป็นการแจ้งเตือนอัตโนมัติ กรุณาอย่าตอบกลับ</small>
-        </div>"
-        ;
-        $mail->CharSet = 'UTF-8';
-        $mail->isHTML(true);
-            $mail->Body = $bodyContent;
+            <small>อีเมลนี้ส่งอัตโนมัติ กรุณาอย่าตอบกลับ</small>
+        </div>";
 
-            // Embed รูป ถ้ามี
-            if (!empty($img_path) && file_exists($img_path)) {
-                $mail->addEmbeddedImage($img_path, $cid, basename($img_path));  // basename เพื่อชื่อไฟล์สวย ๆ
-            }
-
+        $mail->Body = $body;
         $mail->send();
         return true;
+
     } catch (Exception $e) {
-        error_log("ส่งเมลไม่ได้: " . $mail->ErrorInfo);
+        error_log('[MAIL ERROR] ' . $mail->ErrorInfo);
         return false;
     }
 }
 
 // --- Logic Update Status ---
-// --- Logic Update Status ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
+
     $new_status = $_POST['update_status'];
-    $req_id     = $_POST['request_id'];
-    
+    $req_id     = (int)$_POST['request_id'];
+
     $sql = "UPDATE requests SET status = ?, updated_at = NOW()";
-    
-    if ($new_status == 'กำลังซ่อม') {
+
+    if ($new_status === 'กำลังซ่อม') {
         $sql .= ", repair_started_at = NOW()";
-    } elseif ($new_status == 'เสร็จสิ้น') {
+    } elseif ($new_status === 'เสร็จสิ้น') {
         $sql .= ", completed_at = NOW()";
     }
-    
+
     $sql .= " WHERE id = ?";
-    
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("si", $new_status, $req_id);
-    
+
     if ($stmt->execute()) {
-        
-        // ถ้าสถานะเป็น "เสร็จสิ้น" -> ส่งอีเมล
-        if ($new_status == 'เสร็จสิ้น') {
-            $sql_user = "SELECT reporter_email, reported_by, tracking_id, device_type, img_path 
-                         FROM requests WHERE id = ?";
+
+        /* ===== ส่งเมลเฉพาะตอนเสร็จสิ้น ===== */
+        if ($new_status === 'เสร็จสิ้น') {
+
+            $sql_user = "
+                SELECT reporter_email, reported_by, tracking_id, device_type, img_path
+                FROM requests WHERE id = ?
+            ";
             $stmt_user = $conn->prepare($sql_user);
             $stmt_user->bind_param("i", $req_id);
             $stmt_user->execute();
-            $result_user = $stmt_user->get_result();
-            $user_data = $result_user->fetch_assoc();
-            
-            if ($user_data && !empty($user_data['reporter_email'])) {
-                
-                // คำนวณ full path ของรูปที่นี่ (หลังจากได้ $user_data แล้ว)
-                $img_path_db = trim($user_data['img_path'] ?? '');  // ลบช่องว่าง/slash เกิน
-                
+            $user = $stmt_user->get_result()->fetch_assoc();
+
+            if ($user && !empty($user['reporter_email'])) {
+
+                // 🔑 คำนวณ path รูป (Plesk-safe)
                 $full_img_path = '';
-                if (!empty($img_path_db)) {
-                    // ใช้ $_SERVER['DOCUMENT_ROOT'] สำหรับ Plesk (แนะนำที่สุด)
-                    $full_img_path = $_SERVER['DOCUMENT_ROOT'] . '/uploads' . ltrim($img_path_db, '/');
-                    
-                    // หรือถ้า DOCUMENT_ROOT ไม่เวิร์ค ลองใช้ __DIR__ แบบนี้แทน (ขึ้น 2 ชั้นจาก admin/)
-                    // $full_img_path = __DIR__ . '/../../' . ltrim($img_path_db, '/');
-                    
-                    // Debug ชั่วคราว (เปิดดูใน error log)
-                    error_log("[DEBUG] Full image path: " . $full_img_path);
-                    error_log("[DEBUG] File exists? " . (file_exists($full_img_path) ? 'Yes' : 'No'));
+                if (!empty($user['img_path'])) {
+                    $full_img_path = realpath(
+                        __DIR__ . '/../uploads/' . ltrim($user['img_path'], '/')
+                    );
+
+                    error_log('[IMG PATH] ' . $full_img_path);
                 }
-                
-                // เรียกฟังก์ชันโดยส่ง full path
+
                 sendEmailNotification(
-                    $user_data['reporter_email'],
-                    $user_data['reported_by'],
-                    $user_data['tracking_id'],
-                    $user_data['device_type'],
-                    $full_img_path   // ← ส่งอันนี้ ไม่ใช่ $user_data['img_path']
+                    $user['reporter_email'],
+                    $user['reported_by'],
+                    $user['tracking_id'],
+                    $user['device_type'],
+                    $full_img_path
                 );
             }
             $stmt_user->close();
         }
 
-        header("Location: manage_repairs.php?success=1");  // เพิ่ม parameter เพื่อแจ้งว่าสำเร็จ (optional)
+        header("Location: manage_repairs.php?success=1");
         exit();
-    } else {
-        error_log("Update status error: " . $conn->error);  // เก็บ log ดีกว่า alert
-        echo "<script>alert('เกิดข้อผิดพลาดในการอัปเดต: " . addslashes($conn->error) . "');</script>";
     }
-    $stmt->close();
+
+    error_log('[UPDATE ERROR] ' . $conn->error);
 }
 
 $sql = "SELECT * FROM requests ORDER BY created_at DESC";
