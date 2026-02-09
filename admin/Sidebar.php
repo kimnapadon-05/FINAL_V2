@@ -26,7 +26,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <li class="nav-item">
             <a href="dashboard.php" class="nav-link <?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
                 <i class="bi bi-grid-fill"></i>
-                <span>ภาพรวม</span>
+                <span>หน้าหลัก</span>
             </a>
         </li>
         <li class="nav-item">

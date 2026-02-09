@@ -14,8 +14,53 @@ require_once __DIR__ . '/../includes/PHPMailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+// --- ฟังก์ชันย่อรูปภาพสำหรับอีเมล ---
+function resizeImageForMail($src, $maxWidth = 800) {
+    if (!file_exists($src)) return '';
+
+    [$width, $height, $type] = getimagesize($src);
+
+    if ($width <= $maxWidth) {
+        return $src; // ไม่ต้องย่อ
+    }
+
+    $ratio = $height / $width;
+    $newWidth  = $maxWidth;
+    $newHeight = (int)($maxWidth * $ratio);
+
+    $dst = imagecreatetruecolor($newWidth, $newHeight);
+
+    switch ($type) {
+        case IMAGETYPE_JPEG:
+            $srcImg = imagecreatefromjpeg($src);
+            break;
+        case IMAGETYPE_PNG:
+            $srcImg = imagecreatefrompng($src);
+            imagealphablending($dst, false);
+            imagesavealpha($dst, true);
+            break;
+        default:
+            return $src;
+    }
+
+    imagecopyresampled(
+        $dst, $srcImg,
+        0, 0, 0, 0,
+        $newWidth, $newHeight,
+        $width, $height
+    );
+
+    $newPath = dirname($src) . '/mail_' . basename($src);
+    imagejpeg($dst, $newPath, 85);
+
+    imagedestroy($srcImg);
+    imagedestroy($dst);
+
+    return $newPath;
+}
 // --- ฟังก์ชันส่งอีเมลด้วย PHPMailer ---
 function sendEmailNotification($to, $name, $tracking_id, $device, $img_path = '') {
+
     $mail = new PHPMailer(true);
 
     try {
@@ -24,20 +69,18 @@ function sendEmailNotification($to, $name, $tracking_id, $device, $img_path = ''
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = '67319090008@lbtech.ac.th';
-        $mail->Password   = 'tkjb xped lwop vuzi'; // password app Mail
+        $mail->Password   = 'tkjb xped lwop vuzi'; // ใช้ App Password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
-        // ผู้ส่ง / ผู้รับ
-        $mail->setFrom('67319090008@lbtech.ac.th', 'ระบบเเจ้งซ่อมอุปกรณ์ IT');
+        $mail->setFrom('67319090008@lbtech.ac.th', 'ระบบแจ้งซ่อมอุปกรณ์ IT');
         $mail->addAddress($to, $name);
 
-        // Content
         $mail->CharSet = 'UTF-8';
         $mail->isHTML(true);
         $mail->Subject = "แจ้งสถานะการซ่อม: เสร็จสิ้น ($tracking_id)";
 
-        $cid = 'repair_image';
+        $cid = 'repair_img';
 
         $body = "
         <div style='font-family:sans-serif;padding:20px'>
@@ -48,16 +91,16 @@ function sendEmailNotification($to, $name, $tracking_id, $device, $img_path = ''
         ";
 
         if (!empty($img_path) && file_exists($img_path)) {
+            $mail->addEmbeddedImage($img_path, $cid, basename($img_path));
             $body .= "
             <p>รูปอุปกรณ์:</p>
-            <img src='cid:$cid' style='max-width:100%;border-radius:8px'>";
-            $mail->addEmbeddedImage($img_path, $cid, basename($img_path));
+            <img src='cid:$cid' style=' max-width:400px; width:100%; height:auto; border-radius:8px; display:block;'>";
         }
 
         $body .= "
             <hr>
             <p>สถานะปัจจุบัน: <b style='color:green'>เสร็จสิ้น</b></p>
-            <p>คุณสามารถติดต่อรับอุปกรณ์คืนได้ที่แผนกเทคโนโลยีคอมพิวเตอร์ครับ</p>
+            <p>สามารถติดต่อรับอุปกรณ์คืนได้ที่แผนกเทคโนโลยีคอมพิวเตอร์</p>
             <small>อีเมลนี้ส่งอัตโนมัติ กรุณาอย่าตอบกลับ</small>
         </div>";
 
@@ -91,28 +134,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
 
     if ($stmt->execute()) {
 
-        /* ===== ส่งเมลเฉพาะตอนเสร็จสิ้น ===== */
         if ($new_status === 'เสร็จสิ้น') {
 
-            $sql_user = "
+            $stmt_user = $conn->prepare("
                 SELECT reporter_email, reported_by, tracking_id, device_type, img_path
                 FROM requests WHERE id = ?
-            ";
-            $stmt_user = $conn->prepare($sql_user);
+            ");
             $stmt_user->bind_param("i", $req_id);
             $stmt_user->execute();
             $user = $stmt_user->get_result()->fetch_assoc();
 
             if ($user && !empty($user['reporter_email'])) {
 
-                // 🔑 คำนวณ path รูป (Plesk-safe)
                 $full_img_path = '';
-                if (!empty($user['img_path'])) {
-                    $full_img_path = realpath(
-                        __DIR__ . '/../uploads/' . ltrim($user['img_path'], '/')
-                    );
 
-                    error_log('[IMG PATH] ' . $full_img_path);
+                if (!empty($user['img_path'])) {
+                    $relative = preg_replace('#^uploads/#', '', $user['img_path']);
+                    $origin  = __DIR__ . '/../uploads/' . $relative;
+
+                    if (file_exists($origin)) {
+                        $full_img_path = resizeImageForMail($origin, 800);
+                    }
                 }
 
                 sendEmailNotification(
