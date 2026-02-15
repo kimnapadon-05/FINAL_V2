@@ -44,7 +44,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
                 <i class="bi bi-info-circle me-2"></i>ข้อมูลอุปกรณ์
             </h5>
             
-            <form action="/Project_Final/admin/generate_qr.php" method="POST" enctype="multipart/form-data">
+            <form action="generate_qr.php" method="POST" enctype="multipart/form-data">
                 <div class="row g-4">
                     <div class="col-md-6">
                         <label class="form-label">รหัสครุภัณฑ์ <span class="text-danger">*</span></label>
@@ -114,11 +114,10 @@ if (!isset($_SESSION['admin_logged_in'])) {
 </html>
 
 <script>
-    // ข้อมูลห้อง (Copy มาจากหน้า index.php เพื่อให้ข้อมูลตรงกันเป๊ะๆ)
     const roomData = {
-        "ตึก 14": ["1411", "1412", "1413", "1414", "1415", "1421", "1422", "1423", "1424", "1425", "1431", "1432", "1433", "1434", "1435", "1441", "1442", "1443", "1444", "1445"],
-        "ตึก 26": ["TC201", "TC202", "TC203", "TC204", "TC205"],
-        "Other": ["ห้อง IOT", "ห้อง IT 203", "อื่นๆ"]
+         "ตึก 14": ["1425", "1441", "1442", "1443"],
+         "ตึก 26": ["TC201", "TC202", "TC203", "TC204", "TC205","TC303"],
+         "Other": ["ห้อง IOT", "อื่นๆ"]
     };
 
     const buildingSelect = document.getElementById('adminBuildingSelect');

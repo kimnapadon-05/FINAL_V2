@@ -6,13 +6,13 @@ if (!isset($_SESSION['admin_logged_in'])) { header("Location: index.php"); exit(
 include '../db_connect.php';
 
 // --- เรียกใช้ PHPMailer ---
-// ตรวจสอบ Path ให้ถูกต้อง (สมมติว่าคุณเก็บไว้ใน includes/PHPMailer/src/)
-require_once __DIR__ . '/../includes/PHPMailer/src/Exception.php';
-require_once __DIR__ . '/../includes/PHPMailer/src/PHPMailer.php';
-require_once __DIR__ . '/../includes/PHPMailer/src/SMTP.php';
+require_once __DIR__ . '/../includes/PHPmailer/src/Exception.php';
+require_once __DIR__ . '/../includes/PHPmailer/src/PHPMailer.php';
+require_once __DIR__ . '/../includes/PHPmailer/src/SMTP.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPmailer\PHPMailer;
+use PHPMailer\PHPmailer\Exception;
+use PHPMailer\PHPmailer\SMTP;
 
 // --- ฟังก์ชันย่อรูปภาพสำหรับอีเมล ---
 function resizeImageForMail($src, $maxWidth = 800) {
@@ -59,8 +59,8 @@ function resizeImageForMail($src, $maxWidth = 800) {
     return $newPath;
 }
 // --- ฟังก์ชันส่งอีเมลด้วย PHPMailer ---
-function sendEmailNotification($to, $name, $tracking_id, $device, $img_path = '') {
-
+function sendEmailNotification($to, $name, $tracking_id, $device, $location, $problem, $img_path = '')
+{
     $mail = new PHPMailer(true);
 
     try {
@@ -69,39 +69,65 @@ function sendEmailNotification($to, $name, $tracking_id, $device, $img_path = ''
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = '67319090008@lbtech.ac.th';
-        $mail->Password   = 'tkjb xped lwop vuzi'; // ใช้ App Password
+        $mail->Password   = 'tkjb xped lwop vuzi';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
+        // ผู้ส่ง / ผู้รับ
         $mail->setFrom('67319090008@lbtech.ac.th', 'ระบบแจ้งซ่อมอุปกรณ์ IT');
         $mail->addAddress($to, $name);
 
         $mail->CharSet = 'UTF-8';
         $mail->isHTML(true);
-        $mail->Subject = "แจ้งสถานะการซ่อม: เสร็จสิ้น ($tracking_id)";
+        $mail->Subject = "แจ้งสถานะงานซ่อม: เสร็จสิ้น ($tracking_id)";
 
-        $cid = 'repair_img';
+        /* ===== CID ===== */
+        $logoCID = 'org_logo';
+        $imgCID  = 'repair_image';
 
+        /* ===== โลโก้ ===== */
+        $logoPath = __DIR__ . '/../uploads/logo.png';
+        if (file_exists($logoPath)) {
+            $mail->addEmbeddedImage($logoPath, $logoCID, 'logo.png');
+        }
+
+        /* ===== HTML Email ===== */
         $body = "
-        <div style='font-family:sans-serif;padding:20px'>
-            <h2 style='color:#28a745'>งานซ่อมเสร็จสิ้นแล้ว ✅</h2>
-            <p>เรียนคุณ <b>$name</b></p>
-            <p>รหัสงาน: <b>$tracking_id</b></p>
-            <p>อุปกรณ์: <b>$device</b></p>
+        <div style='font-family:Kanit,sans-serif;max-width:600px;margin:auto;border:1px solid #ddd;border-radius:10px;padding:20px'>
+
+            <div style='text-align:center;margin-bottom:15px'>
+                <img src='cid:$logoCID' style='max-width:120px'><br>
+                <small style='color:#777'>ระบบแจ้งซ่อมอุปกรณ์ IT</small>
+            </div>
+
+            <h3 style='color:#198754'>แจ้งสถานะงานซ่อมอุปกรณ์</h3>
+
+            <p><b>ผู้แจ้ง:</b> {$name}</p>
+            <p><b>รหัสงาน:</b> {$tracking_id}</p>
+            <p><b>สถานะ:</b> <span style='color:green;font-weight:bold'>เสร็จสิ้น</span></p>
+
+            <hr>
+
+            <p><b>อุปกรณ์:</b> {$device}</p>
+            <p><b>สถานที่:</b> {$location}</p>
+            <p><b>อาการ:</b> {$problem}</p>
         ";
 
+        /* ===== รูปงาน (ท้ายสุด) ===== */
         if (!empty($img_path) && file_exists($img_path)) {
-            $mail->addEmbeddedImage($img_path, $cid, basename($img_path));
             $body .= "
-            <p>รูปอุปกรณ์:</p>
-            <img src='cid:$cid' style=' max-width:400px; width:100%; height:auto; border-radius:8px; display:block;'>";
+            <hr>
+            <p><b>รูปประกอบ:</b></p>
+            <img src='cid:$imgCID'
+                 style='max-width:420px;width:100%;border-radius:8px;border:1px solid #ccc'>
+            ";
+            $mail->addEmbeddedImage($img_path, $imgCID, basename($img_path));
         }
 
         $body .= "
             <hr>
-            <p>สถานะปัจจุบัน: <b style='color:green'>เสร็จสิ้น</b></p>
-            <p>สามารถติดต่อรับอุปกรณ์คืนได้ที่แผนกเทคโนโลยีคอมพิวเตอร์</p>
-            <small>อีเมลนี้ส่งอัตโนมัติ กรุณาอย่าตอบกลับ</small>
+            <p>คุณสามารถติดต่อรับอุปกรณ์คืนได้ที่แผนกเทคโนโลยีคอมพิวเตอร์</p>
+            <small style='color:#999'>อีเมลนี้ส่งอัตโนมัติ กรุณาอย่าตอบกลับ</small>
         </div>";
 
         $mail->Body = $body;
@@ -114,66 +140,53 @@ function sendEmailNotification($to, $name, $tracking_id, $device, $img_path = ''
     }
 }
 
-// --- Logic Update Status ---
+/* ================= Update Status ================= */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
 
     $new_status = $_POST['update_status'];
     $req_id     = (int)$_POST['request_id'];
 
     $sql = "UPDATE requests SET status = ?, updated_at = NOW()";
-
-    if ($new_status === 'กำลังซ่อม') {
-        $sql .= ", repair_started_at = NOW()";
-    } elseif ($new_status === 'เสร็จสิ้น') {
-        $sql .= ", completed_at = NOW()";
-    }
-
+    if ($new_status === 'กำลังซ่อม') $sql .= ", repair_started_at = NOW()";
+    if ($new_status === 'เสร็จสิ้น') $sql .= ", completed_at = NOW()";
     $sql .= " WHERE id = ?";
+
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("si", $new_status, $req_id);
 
-    if ($stmt->execute()) {
+    if ($stmt->execute() && $new_status === 'เสร็จสิ้น') {
 
-        if ($new_status === 'เสร็จสิ้น') {
+        $q = $conn->prepare("
+            SELECT reporter_email, reported_by, tracking_id,
+                   device_type, building, room, problem_description, img_path
+            FROM requests WHERE id = ?
+        ");
+        $q->bind_param("i", $req_id);
+        $q->execute();
+        $r = $q->get_result()->fetch_assoc();
 
-            $stmt_user = $conn->prepare("
-                SELECT reporter_email, reported_by, tracking_id, device_type, img_path
-                FROM requests WHERE id = ?
-            ");
-            $stmt_user->bind_param("i", $req_id);
-            $stmt_user->execute();
-            $user = $stmt_user->get_result()->fetch_assoc();
+        if ($r && !empty($r['reporter_email'])) {
 
-            if ($user && !empty($user['reporter_email'])) {
-
-                $full_img_path = '';
-
-                if (!empty($user['img_path'])) {
-                    $relative = preg_replace('#^uploads/#', '', $user['img_path']);
-                    $origin  = __DIR__ . '/../uploads/' . $relative;
-
-                    if (file_exists($origin)) {
-                        $full_img_path = resizeImageForMail($origin, 800);
-                    }
-                }
-
-                sendEmailNotification(
-                    $user['reporter_email'],
-                    $user['reported_by'],
-                    $user['tracking_id'],
-                    $user['device_type'],
-                    $full_img_path
-                );
+            $imgFull = '';
+            if (!empty($r['img_path'])) {
+                $imgFull = __DIR__ . '/../' . ltrim($r['img_path'], '/');
             }
-            $stmt_user->close();
-        }
 
-        header("Location: manage_repairs.php?success=1");
-        exit();
+            sendEmailNotification(
+                $r['reporter_email'],
+                $r['reported_by'],
+                $r['tracking_id'],
+                $r['device_type'],
+                $r['building'] . ' ' . $r['room'],
+                $r['problem_description'],
+                $imgFull
+            );
+        }
     }
 
-    error_log('[UPDATE ERROR] ' . $conn->error);
-}
+    header("Location: manage_repairs.php?success=1");
+    exit();
+   }
 
 $sql = "SELECT * FROM requests ORDER BY created_at DESC";
 $result = $conn->query($sql);
@@ -389,7 +402,18 @@ $result = $conn->query($sql);
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#manageTable').DataTable({ "language": { "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json" }, "order": [[ 0, "desc" ]] });
+            $('#manageTable').DataTable({
+    language: {
+        url: "//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json"
+    },
+    order: [[ 3, "desc" ]], // ล่าสุดก่อน
+    columnDefs: [
+        {
+            targets: -1,     // คอลัมน์สุดท้าย (จัดการ)
+            orderable: false
+        }
+    ]
+});
             $(document).on('click', '.btn-view-case', function() {
                 const b = $(this);
                 $('#modalRequestId').val(b.data('id'));

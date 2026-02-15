@@ -11,6 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $serial_no = $_POST['serial_no'];
     $building = $_POST['building'];
     $room = $_POST['room'];
+	$location = $building . " " . $room;
     
 
     // --- 1. จัดการรูปภาพ (Image) ---
