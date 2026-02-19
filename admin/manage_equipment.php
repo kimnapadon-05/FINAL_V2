@@ -173,7 +173,7 @@ require_once "../db_connect.php"; // ตรวจสอบ path ให้ถู�
                 "columnDefs": [
                     { "orderable": false, "targets": 0 } // ห้ามเรียงลำดับคอลัมน์ Checkbox
                 ],
-                "order": [[ 2, "desc" ]] // เรียงตาม Asset ID ล่าสุด
+                "order": [[ 3, "asc" ]] // เรียงตาม Asset ID ล่าสุด
             });
 
             // ฟังก์ชัน Select All (ใช้ Event Delegation เพื่อให้ทำงานกับทุกหน้าของ DataTable)

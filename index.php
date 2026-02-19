@@ -159,7 +159,6 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
                         </div>
                         
                         <form action="save_repair.php" method="POST" enctype="multipart/form-data" id="repairForm">
-                            <input type="hidden" name="email" id="emailInputHidden"> 
                             <input type="hidden" name="scanned_asset_id" id="scannedAssetId" value="<?php echo $url_asset_id; ?>">
 
                             <div class="row g-3 mb-3">
@@ -168,21 +167,17 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
                                     <input type="text" class="form-control" name="reporter_name" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">รหัสบุคลากร</label>
+                                    <label class="form-label">รหัสบุคลากร<span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="reporter_id" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">เบอร์โทรติดต่อ</label>
+                                    <label class="form-label">เบอร์โทรติดต่อ<span class="text-danger">*</span></label>
                                     <input type="tel" class="form-control" name="reporter_phone" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Username อีเมล <span class="text-danger">*</span></label>
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="emailUsernameInput" placeholder="Username" required>
-                                        <span class="input-group-text">@lbtech.ac.th</span>
-                                    </div>
+                                    <label class="form-label">อีเมล <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" name="email" required>
                                 </div>
-                            </div>
 
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-6">
@@ -214,6 +209,9 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
                                             <option value="AccessPoint">Access point</option>
                                             <option value="Other">อื่นๆ</option>
                                         </select>
+                                        <div id="otherDeviceTypeContainer" class="mt-2" style="display: none;">
+                                            <input type="text" name="device_type_other" id="otherDeviceTypeInput" class="form-control bg-light border-primary" placeholder="โปรดระบุประเภทอุปกรณ์...">
+                                        </div>
                                     </div>
 
                                     <div class="col-md-6">
@@ -224,6 +222,9 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
                                             <option value="ตึก 26">ตึก 26</option>
                                             <option value="Other">ตึกอื่นๆ</option>
                                         </select>
+                                        <div id="otherBuildingContainer" class="mt-2" style="display: none;">
+                                        <input type="text" name="building_other" id="otherBuildingInput" class="form-control bg-light border-primary" placeholder="โปรดระบุตึก หรือ สถานที่..">
+                                    </div>
                                     </div>
                                     
                                     <div class="col-md-6" id="roomDropdownContainer" style="display: none;">
@@ -257,7 +258,7 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
                             </div>
                             
                             <div class="mb-4">
-                                <label class="form-label">รูปภาพประกอบ</label>
+                                <label class="form-label">รูปภาพประกอบ<span class="text-danger">*</span></label>
                                 <input class="form-control" type="file" name="repair_image" accept="image/*">
                             </div>
 
@@ -338,25 +339,66 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         
-        // --- ส่วน Dropdown ห้อง (คงเดิม) ---
+        const deviceTypeSelect = document.getElementById('deviceTypeSelect');
+        const otherDeviceTypeContainer = document.getElementById('otherDeviceTypeContainer');
+        const otherDeviceTypeInput = document.getElementById('otherDeviceTypeInput');
+
+        if (deviceTypeSelect) {
+            deviceTypeSelect.addEventListener('change', function() {
+                if (this.value === 'Other') {
+                    otherDeviceTypeContainer.style.display = 'block';
+                    otherDeviceTypeInput.setAttribute('required', 'required');
+                } else {
+                    otherDeviceTypeContainer.style.display = 'none';
+                    otherDeviceTypeInput.removeAttribute('required');
+                    otherDeviceTypeInput.value = '';
+                }
+            });
+        }
+        
+        // 1. เพิ่มตัวแปรสำหรับกล่องตึกอื่นๆ (ต้องมี HTML กล่องนี้ซ่อนอยู่ด้วยนะ)
+        const buildingSelect = document.getElementById('buildingSelect');
+        const otherBuildingContainer = document.getElementById('otherBuildingContainer');
+        const otherBuildingInput = document.getElementById('otherBuildingInput');
+        
+        // 2. ดักจับว่าถ้าเลือก "Other" ให้เปิดกล่องพิมพ์ตึก
+        if (buildingSelect) {
+            buildingSelect.addEventListener('change', function() {
+                if (this.value === 'Other') {
+                    otherBuildingContainer.style.display = 'block';
+                    otherBuildingInput.setAttribute('required', 'required');
+                } else {
+                    otherBuildingContainer.style.display = 'none';
+                    otherBuildingInput.removeAttribute('required');
+                    otherBuildingInput.value = '';
+                }
+            });
+        }
+
+        // 3. ข้อมูลห้อง (พี่เอา "Other" ออกจากตรงนี้แล้ว เพราะถ้าเลือก Other เราจะซ่อนช่องห้องไปเลย)
         const roomData = {
             "ตึก 14": ["1425", "1441", "1442", "1443"],
-            "ตึก 26": ["TC201", "TC202", "TC203", "TC204", "TC205","TC303"],
-            "Other": ["ห้อง IOT", "อื่นๆ"]
+            "ตึก 26": ["TC201", "TC202", "TC203", "TC204", "TC205", "TC303"]
         };
-        const buildingSelect = document.getElementById('buildingSelect');
+        
         const roomContainer = document.getElementById('roomDropdownContainer');
         const roomSelect = document.getElementById('roomSelect');
-        const repairForm = document.getElementById('repairForm');
-        const emailUsernameInput = document.getElementById('emailUsernameInput');
-        const emailInputHidden = document.getElementById('emailInputHidden');
-        const requiredDomain = '@lbtech.ac.th';
 
         function loadRooms() {
             if (!buildingSelect) return;
             const selectedBuilding = buildingSelect.value;
-            if (roomSelect) roomSelect.innerHTML = '<option value="">-- เลือกห้อง --</option>';
             
+            // ล้างค่าห้องเก่า
+            if (roomSelect) roomSelect.innerHTML = '<option value="">-- เลือกห้อง --</option>';
+
+            // 🔥 เช็คเงื่อนไข: ถ้าเลือก "Other" ให้ปิดช่องห้องไปเลย
+            if (selectedBuilding === 'Other') {
+                if (roomContainer) roomContainer.style.display = 'none';
+                if (roomSelect) roomSelect.required = false;
+                return; // หยุดทำงานแค่นี้
+            }
+            
+            // ถ้าเลือกตึกปกติ ก็โชว์ห้องตามปกติ
             if (selectedBuilding && roomData[selectedBuilding] && roomSelect) {
                 roomData[selectedBuilding].forEach(room => {
                     const option = document.createElement('option');
@@ -371,22 +413,10 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
                 if (roomSelect) roomSelect.required = false;
             }
         }
-        if (buildingSelect) buildingSelect.addEventListener('change', loadRooms);
-        loadRooms();
         
-        // Form Validation
-        if (repairForm) {
-            repairForm.addEventListener('submit', function(event) {
-                const username = emailUsernameInput.value.trim();
-                if (username === '' || username.includes('@')) {
-                    event.preventDefault();
-                    alert('โปรดกรอกแค่ชื่อผู้ใช้ (ไม่ต้องใส่ @lbtech.ac.th)');
-                    emailUsernameInput.focus(); return;
-                }
-                emailInputHidden.value = username + requiredDomain;
-            });
-        }
-
+        if (buildingSelect) buildingSelect.addEventListener('change', loadRooms);
+        loadRooms(); // ทำงานครั้งแรกตอนโหลดหน้าเว็บ
+        
         // --- 2. Scanner Logic (แก้ไขการ Parsing Text ให้ฉลาดขึ้น) ---
         let html5QrCode = null;
         let scanMode = null; 
@@ -621,10 +651,18 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
                             equipIcon.classList.remove('d-none');
                         }
                         
+                        // 👇 --- จุดที่พี่แก้ให้วางถูกที่ --- 👇
                         const typeMap = {'COMPUTER EQUIPMENT': 'Computer', 'NETWORK': 'AccessPoint', 'PRINTER': 'Other'};
-                        const mappedType = typeMap[data.equipment_type] || 'Other';
+                        // .toUpperCase() กันเหนียว เผื่อข้อมูลใน DB เป็นพิมพ์เล็ก
+                        const mappedType = typeMap[data.equipment_type.toUpperCase()] || 'Other'; 
                         const deviceSelect = document.getElementById('deviceTypeSelect');
-                        if(deviceSelect) deviceSelect.value = mappedType;
+                        
+                        if(deviceSelect) {
+                            deviceSelect.value = mappedType;
+                            // Trigger การเปลี่ยนค่าเพื่อซ่อน/แสดงช่อง Other ทันที
+                            deviceSelect.dispatchEvent(new Event('change'));
+                        }
+                        // 👆 ---------------------------- 👆
 
                         // Auto Select Building
                         if (data.location.includes("14")) buildingSelect.value = "ตึก 14";
@@ -715,6 +753,23 @@ $url_asset_id = isset($_GET['asset_id']) ? htmlspecialchars($_GET['asset_id']) :
             fetchEquipmentData(urlAssetId);
         }
     });
+    // 1. Script ควบคุมการแสดงช่อง "อื่นๆ"
+        const deviceTypeSelect = document.getElementById('deviceTypeSelect');
+        const otherDeviceTypeContainer = document.getElementById('otherDeviceTypeContainer');
+        const otherDeviceTypeInput = document.getElementById('otherDeviceTypeInput');
+
+        if (deviceTypeSelect) {
+            deviceTypeSelect.addEventListener('change', function() {
+                if (this.value === 'Other') {
+                    otherDeviceTypeContainer.style.display = 'block';
+                    otherDeviceTypeInput.setAttribute('required', 'required'); // บังคับกรอก
+                } else {
+                    otherDeviceTypeContainer.style.display = 'none';
+                    otherDeviceTypeInput.removeAttribute('required');
+                    otherDeviceTypeInput.value = ''; // เคลียร์ค่า
+                }
+            });
+        }
 </script>
 
 <?php include 'includes/footer.php'; ?>

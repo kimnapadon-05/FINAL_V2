@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Feb 15, 2026 at 04:27 PM
+-- Generation Time: Feb 17, 2026 at 07:08 AM
 -- Server version: 10.11.14-MariaDB-0+deb12u2-log
 -- PHP Version: 8.4.16
 
@@ -65,7 +65,47 @@ CREATE TABLE `equipment` (
 --
 
 INSERT INTO `equipment` (`id`, `asset_id`, `equipment_name`, `model_name`, `equipment_type`, `serial_no`, `location`, `image_path`, `qr_path`, `created_at`) VALUES
-(22, '2026-01', 'COM-01', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004CA63000', 'ตึก 26 TC203', 'uploads/Img_2026-01.png', 'qrcodes/QR_2026-01.png', '2026-02-11 07:43:10');
+(22, '2026-01', 'COM-01', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004CA63000', 'ตึก 26 TC203', 'uploads/Img_2026-01.png', 'qrcodes/QR_2026-01.png', '2026-02-11 07:43:10'),
+(23, '2026-02', 'COM-02', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004CA23000', 'ตึก 26 TC203', 'uploads/Img_2026-02.png', 'qrcodes/QR_2026-02.png', '2026-02-16 15:13:29'),
+(24, '2026-03', 'COM-03', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004E3E3000', 'ตึก 26 TC203', 'uploads/Img_2026-03.png', 'qrcodes/QR_2026-03.png', '2026-02-16 15:18:42'),
+(25, '2026-04', 'COM-04', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004E3F3000', 'ตึก 26 TC203', 'uploads/Img_2026-04.png', 'qrcodes/QR_2026-04.png', '2026-02-16 15:21:07'),
+(28, '2026-05', 'COM-05', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004CD23000', 'ตึก 26 TC203', 'uploads/Img_2026-05.png', 'qrcodes/QR_2026-05.png', '2026-02-16 17:47:06'),
+(29, '2026-06', 'COM-06', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST001140005FB3000', 'ตึก 26 TC203', 'uploads/Img_2026-06.png', 'qrcodes/QR_2026-06.png', '2026-02-16 17:52:48'),
+(30, '2026-07', 'COM-07', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004E373000', 'ตึก 26 TC203', 'uploads/Img_2026-07.png', 'qrcodes/QR_2026-07.png', '2026-02-16 17:53:55'),
+(31, '2026-08', 'COM-08', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004D563000', 'ตึก 26 TC203', 'uploads/Img_2026-08.png', 'qrcodes/QR_2026-08.png', '2026-02-16 17:54:54'),
+(32, '2026-09', 'COM-09', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004E5C3000', 'ตึก 26 TC203', 'uploads/Img_2026-09.png', 'qrcodes/QR_2026-09.png', '2026-02-16 17:55:37'),
+(33, '2026-10', 'COM-10', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004D393000', 'ตึก 26 TC203', 'uploads/Img_2026-10.png', 'qrcodes/QR_2026-10.png', '2026-02-16 17:56:10'),
+(34, '2026-11', 'COM-11', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004E363000', 'ตึก 26 TC203', 'uploads/Img_2026-11.png', 'qrcodes/QR_2026-11.png', '2026-02-16 17:56:44'),
+(35, '2026-12', 'COM-12', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST001140004A93000', 'ตึก 26 TC203', 'uploads/Img_2026-12.png', 'qrcodes/QR_2026-12.png', '2026-02-16 17:57:37'),
+(36, '2026-13', 'COM-13', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004E383000', 'ตึก 26 TC203', 'uploads/Img_2026-13.png', 'qrcodes/QR_2026-13.png', '2026-02-16 17:58:33'),
+(37, '2026-14', 'COM-14', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST0011400054E3000', 'ตึก 26 TC203', 'uploads/Img_2026-14.png', 'qrcodes/QR_2026-14.png', '2026-02-16 17:59:05'),
+(38, '2026-15', 'COM-15', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004CAC3000', 'ตึก 26 TC203', 'uploads/Img_2026-15.png', 'qrcodes/QR_2026-15.png', '2026-02-16 17:59:42'),
+(39, '2026-16', 'COM-16', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004E2D3000', 'ตึก 26 TC203', 'uploads/Img_2026-16.png', 'qrcodes/QR_2026-16.png', '2026-02-16 18:00:50'),
+(40, '2026-17', 'COM-17', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004E743000', 'ตึก 26 TC203', 'uploads/Img_2026-17.png', 'qrcodes/QR_2026-17.png', '2026-02-16 18:01:24'),
+(41, '2026-18', 'COM-18', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004E2C3000', 'ตึก 26 TC203', 'uploads/Img_2026-18.png', 'qrcodes/QR_2026-18.png', '2026-02-16 18:01:52'),
+(42, '2026-19', 'COM-19', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004C9E3000', 'ตึก 26 TC203', 'uploads/Img_2026-19.png', 'qrcodes/QR_2026-19.png', '2026-02-16 18:59:37'),
+(43, '2026-20', 'COM-20', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST001140004C43000', 'ตึก 26 TC203', 'uploads/Img_2026-20.png', 'qrcodes/QR_2026-20.png', '2026-02-16 19:01:47'),
+(44, '2026-21', 'COM-21', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004E353000', 'ตึก 26 TC203', 'uploads/Img_2026-21.png', 'qrcodes/QR_2026-21.png', '2026-02-16 19:05:42'),
+(45, '2026-22', 'COM-22', '(AIO) Acer Veriton Z VZ4870G', 'COMPUTER EQUIPMENT', 'DZVTQST00114004D4A3000', 'ตึก 26 TC203', 'uploads/Img_2026-22.png', 'qrcodes/QR_2026-22.png', '2026-02-16 19:06:08'),
+(47, '2026-23', 'COM-01', 'ideacentre AIO 3-22IMB05', 'COMPUTER EQUIPMENT', 'MP1RQA3B', 'ตึก 26 TC205', 'uploads/Img_2026-23.jpg', 'qrcodes/QR_2026-23.png', '2026-02-16 23:33:34'),
+(48, '2026-24', 'COM-02', 'ideacentre AIO 3-22IMB05', 'COMPUTER EQUIPMENT', 'MP1RQA3S', 'ตึก 26 TC205', 'uploads/Img_2026-24.jpg', 'qrcodes/QR_2026-24.png', '2026-02-16 23:35:08'),
+(49, '2026-25', 'COM-03', 'ideacentre AIO 3-22IMB05', 'COMPUTER EQUIPMENT', 'MP1RQ322', 'ตึก 26 TC205', 'uploads/Img_2026-25.jpg', 'qrcodes/QR_2026-25.png', '2026-02-16 23:35:48'),
+(50, '2026-26', 'COM-04', 'ideacentre AIO 3-22IMB05', 'COMPUTER EQUIPMENT', 'MP1RQ59L', 'ตึก 26 TC205', 'uploads/Img_2026-27.jpg', 'qrcodes/QR_2026-27.png', '2026-02-16 23:36:44'),
+(51, '2026-27', 'COM-05', 'ideacentre AIO 3-22IMB05', 'COMPUTER EQUIPMENT', 'MP1RQYNW', 'ตึก 26 TC205', 'uploads/Img_2026-28.jpg', 'qrcodes/QR_2026-28.png', '2026-02-16 23:39:12'),
+(52, '2026-28', 'COM-06', 'ideacentre AIO 3-22IMB05', 'COMPUTER EQUIPMENT', 'MP1RQYNH', 'ตึก 26 TC205', 'uploads/Img_2026-29.jpg', 'qrcodes/QR_2026-29.png', '2026-02-16 23:39:42'),
+(53, '2026-29', 'COM-07', 'ideacentre AIO 3-22IMB05', 'COMPUTER EQUIPMENT', 'MP1RQYL0', 'ตึก 26 TC205', 'uploads/Img_2026-29.jpg', 'qrcodes/QR_2026-29.png', '2026-02-16 23:43:22'),
+(54, '2026-30', 'COM-09', 'ideacentre AIO 3-22IMB05', 'COMPUTER EQUIPMENT', 'MP1RQA1Q', 'ตึก 26 TC205', 'uploads/Img_2026-30.jpg', 'qrcodes/QR_2026-30.png', '2026-02-16 23:43:52'),
+(55, '2026-31', 'COM-10', 'ideacentre AIO 3-22IMB05', 'COMPUTER EQUIPMENT', 'MP1RQ7T', 'ตึก 26 TC205', 'uploads/Img_2026-31.jpg', 'qrcodes/QR_2026-31.png', '2026-02-16 23:45:09'),
+(56, '2026-32', 'COM-11', 'HP ProOne 600 G2 Base Model', 'COMPUTER EQUIPMENT', 'SGH631RM90', 'ตึก 26 TC205', 'uploads/Img_2026-32.png', 'qrcodes/QR_2026-32.png', '2026-02-16 23:51:13'),
+(57, '2026-33', 'COM-12', 'HP ProOne 600 G2 Base Model', 'COMPUTER EQUIPMENT', 'SGH631RM99\r\n', 'ตึก 26 TC205', 'uploads/Img_2026-33.png', 'qrcodes/QR_2026-33.png', '2026-02-16 23:52:54'),
+(58, '2026-34', 'COM-13', 'HP ProOne 600 G2 Base Model', 'COMPUTER EQUIPMENT', 'SGH631RM7Q\r\n', 'ตึก 26 TC205', 'uploads/Img_2026-34.png', 'qrcodes/QR_2026-34.png', '2026-02-16 23:54:11'),
+(59, '2026-35', 'COM-14', 'HP ProOne 600 G2 Base Model', 'COMPUTER EQUIPMENT', 'SGH631RM98\r\n', 'ตึก 26 TC205', 'uploads/Img_2026-35.png', 'qrcodes/QR_2026-35.png', '2026-02-16 23:54:34'),
+(60, '2026-36', 'COM-15', 'HP ProOne 600 G2 Base Model', 'COMPUTER EQUIPMENT', 'SGH631RM94\r\n', 'ตึก 26 TC205', 'uploads/Img_2026-36.png', 'qrcodes/QR_2026-36.png', '2026-02-16 23:55:58'),
+(61, '2026-37', 'COM-16', 'HP ProOne 600 G2 Base Model', 'COMPUTER EQUIPMENT', 'SGH631RM74\r\n', 'ตึก 26 TC205', 'uploads/Img_2026-37.png', 'qrcodes/QR_2026-37.png', '2026-02-16 23:57:28'),
+(62, '2026-38', 'COM-17', 'HP ProOne 600 G2 Base Model', 'COMPUTER EQUIPMENT', 'SGH633SKDJ\r\n', 'ตึก 26 TC205', 'uploads/Img_2026-38.png', 'qrcodes/QR_2026-38.png', '2026-02-16 23:58:01'),
+(63, '2026-39', 'COM-18', 'HP ProOne 600 G2 Base Model', 'COMPUTER EQUIPMENT', 'SGH629PZJ2\r\n', 'ตึก 26 TC205', 'uploads/Img_2026-39.png', 'qrcodes/QR_2026-39.png', '2026-02-16 23:59:04'),
+(64, '2026-40', 'COM-19', 'HP ProOne 600 G2 Base Model', 'COMPUTER EQUIPMENT', 'SGH633SK9V', 'ตึก 26 TC205', 'uploads/Img_2026-40.png', 'qrcodes/QR_2026-40.png', '2026-02-17 00:04:50'),
+(65, '2026-41', 'COM-20', 'HP ProOne 600 G2 Base Model', 'COMPUTER EQUIPMENT', 'SGH629PZ8N', 'ตึก 26 TC205', 'uploads/Img_2026-41.png', 'qrcodes/QR_2026-41.png', '2026-02-17 00:05:37');
 
 -- --------------------------------------------------------
 
@@ -150,7 +190,7 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `equipment`
 --
 ALTER TABLE `equipment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
 
 --
 -- AUTO_INCREMENT for table `requests`

@@ -8,7 +8,6 @@ $conn->set_charset("utf8");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
-    // 2. รับค่าตัวแปร (ตรวจสอบให้ชื่อตรงกับ name ในฟอร์ม)
     $reporter_name  = $_POST['reporter_name'] ?? '';
     $reporter_id    = mysqli_real_escape_string($conn, $_POST['reporter_id']);
     $reporter_phone = $_POST['reporter_phone'] ?? '';
@@ -17,10 +16,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $device_serial  = mysqli_real_escape_string($conn, $_POST['device_serial']);
     $device_name    = mysqli_real_escape_string($conn, $_POST['device_name']);
-    $device_type    = $_POST['device_type'] ?? '';
+    
+    $device_type = $_POST['device_type'] ?? '';
+    if ($device_type === 'Other' && !empty($_POST['device_type_other'])) {
+        $device_type = trim($_POST['device_type_other']); // เอาค่าที่พิมพ์เองไปเซฟแทน
+    }
+    
     $device_model   = mysqli_real_escape_string($conn, $_POST['device_model'] ?? '');
 
-    $building       = $_POST['building'] ?? '';
+    $building = $_POST['building'] ?? '';
+    if ($building === 'Other' && !empty($_POST['building_other'])) {
+        $building = trim($_POST['building_other']); // เอาค่าที่พิมพ์เองไปเซฟแทน
+    }
+
     $room           = $_POST['room'] ?? '-'; 
     $problem_detail = $_POST['problem_detail'] ?? '';
 
@@ -39,7 +47,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // 4. SQL Statement (นับช่องให้เป๊ะ: มี 15 ช่องที่ต้องใช้ ?)
     $sql = "INSERT INTO requests (
         tracking_id, 
         status, 
@@ -62,20 +69,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $conn->prepare($sql);
     
     if ($stmt) {
-        // s ทั้งหมด 15 ตัว (Created_at ใช้ NOW() ไม่ต้องนับ)
         $stmt->bind_param("sssssssssssssss", 
             $tracking_id,       // 1
             $initial_status,    // 2
-            $reporter_name,     // 4
-            $reporter_id,       // 3
+            $reporter_name,     // 3 
+            $reporter_id,       // 4
             $scanned_asset_id,  // 5
             $reporter_phone,    // 6
             $reporter_email,    // 7
-            $device_type,       // 8
+            $device_type,       // 8 
             $device_model,      // 9
             $device_serial,     // 10
             $device_name,       // 11
-            $building,          // 12
+            $building,          // 12 
             $room,              // 13
             $problem_detail,    // 14
             $image_path         // 15
