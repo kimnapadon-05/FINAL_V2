@@ -1,6 +1,6 @@
 <?php
 require_once "db_connect.php";
-require_once "phpqrcode/qrlib.php"; // อย่าลืมเช็ค Path นี้ให้ถูกนะครับ
+require_once "phpqrcode/qrlib.php"; 
 
 if (!isset($_POST['selected_ids']) || empty($_POST['selected_ids'])) {
     die("<h3 style='text-align:center; margin-top:50px;'>⚠️ กรุณาเลือกรายการอย่างน้อย 1 รายการ</h3>");
@@ -22,14 +22,66 @@ $result = $conn->query($sql);
     <style>
         @page { size: A4; margin: 0; }
         body { font-family: 'Sarabun', sans-serif; background-color: #555; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .a4-page { width: 210mm; min-height: 297mm; background: white; padding: 10mm; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: min-content; gap: 5mm; align-content: start; }
-        .sticker-strip { width: 100%; height: 20mm; background-color: #FFEA00; border: 1px solid #d4c600; display: flex; align-items: center; justify-content: space-between; padding: 0 2mm; box-sizing: border-box; border-radius: 2px; page-break-inside: avoid; }
-        .qr-box { width: 16mm; height: 16mm; background: #fff; display: flex; align-items: center; justify-content: center; border: 1px solid #000; }
+        
+        .a4-page { 
+            width: 210mm; min-height: 297mm; 
+            background: white; padding: 10mm; 
+            display: grid; grid-template-columns: 1fr 1fr; 
+            grid-auto-rows: min-content; gap: 5mm; align-content: start; 
+        }
+
+        .sticker-strip { 
+            width: 100%; height: 20mm; 
+            background-color: #FFEA00; 
+            border: 1px solid #d4c600; 
+            display: flex; align-items: center; /* จัดให้อยู่กึ่งกลางแนวตั้ง */
+            padding: 0; /* ลบ padding รอบนอกออกเพื่อให้ QR ชิดขอบ */
+            box-sizing: border-box; 
+            border-radius: 2px; 
+            page-break-inside: avoid; 
+            overflow: hidden; /* กันล้น */
+        }
+
+        /* กล่อง QR ด้านซ้าย */
+        .qr-box { 
+            width: 20mm; /* ปรับให้เป็นสี่เหลี่ยมจัตุรัสเท่าความสูง */
+            height: 20mm; 
+            background: #fff; 
+            display: flex; align-items: center; justify-content: center; 
+            border-right: 1px solid #d4c600; /* เส้นคั่นระหว่าง QR กับข้อความ */
+        }
         .qr-box img { width: 90%; height: 90%; object-fit: contain; }
-        .info-box { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; overflow: hidden; }
-        .asset-id { font-family: 'Roboto Mono', monospace; font-size: 14pt; font-weight: 700; letter-spacing: 0.5px; }
-        .dept-text { font-size: 8pt; font-weight: 800; text-transform: uppercase; }
-        @media print { body { background: none; padding: 0; } .no-print { display: none !important; } * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }
+
+        /* กล่องข้อความ (ให้กินพื้นที่ที่เหลือทั้งหมด) */
+        .info-box { 
+            flex-grow: 1; 
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+            line-height: 1; 
+            padding-right: 5mm; /* เว้นระยะขวานิดนึง */
+        }
+        
+        .asset-id { 
+            font-family: 'Roboto Mono', monospace; 
+            font-size: 16pt; /* เพิ่มขนาดตัวอักษรให้ใหญ่ขึ้นเพราะที่เหลือเยอะ */
+            font-weight: 700; 
+            letter-spacing: 0.5px; 
+            color: #000;
+        }
+        
+        .dept-text { 
+            font-size: 9pt; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            color: #333;
+            margin-top: 2px;
+        }
+
+        @media print { 
+            body { background: none; padding: 0; } 
+            .no-print { display: none !important; } 
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } 
+        }
     </style>
 </head>
 <body>
@@ -47,43 +99,37 @@ $result = $conn->query($sql);
                 if (in_array($row['asset_id'], $printed_ids)) continue;
                 $printed_ids[] = $row['asset_id'];
 
-                // --- 🛠️ ระบบอัจฉริยะ: ตามหาไฟล์ หรือ สร้างใหม่ ---
-                
-                // 1. สร้างชื่อไฟล์มาตรฐานที่ "ควรจะเป็น" (QR_AssetID.png)
+                // --- 🛠️ ระบบอัจฉริยะ (เหมือนเดิม) ---
                 $safe_asset_id = preg_replace('/[^A-Za-z0-9\-]/', '_', $row['asset_id']);
                 $expectedPath = "qrcodes/QR_" . $safe_asset_id . ".png";
-                
                 $finalQrPath = "";
 
-                // 2. เช็คว่ามีไฟล์นี้อยู่จริงไหม?
                 if (file_exists($expectedPath)) {
-                    // เย้! เจอไฟล์เก่า ใช้ได้เลย ไม่ต้องสร้างใหม่
                     $finalQrPath = $expectedPath;
-                } 
-                else {
-                    // 3. ถ้าไม่เจอ (หรือเป็นไฟล์ชื่อเก่าที่หาไม่เจอ) -> สร้างใหม่เดี๋ยวนั้นเลย
+                } else {
                     $qrDir = "qrcodes/";
                     if (!is_dir($qrDir)) mkdir($qrDir);
-                    
                     $qrData = "IT|" . $row['asset_id'] . "|" . $row['equipment_type'] . "|" . $row['serial_no'] . "|" . $row['equipment_name'] . "|" . $row['location'];
-                    
                     QRcode::png($qrData, $expectedPath, QR_ECLEVEL_L, 4);
-                    $finalQrPath = $expectedPath; // ใช้ไฟล์ใหม่ที่เพิ่งสร้าง
+                    $finalQrPath = $expectedPath;
                 }
                 
-                // 4. (Optional) อัปเดต Database ให้ตรงกันเป๊ะๆ เพื่อความชัวร์ในอนาคต
                 if ($row['qr_path'] != $finalQrPath) {
                     $conn->query("UPDATE equipment SET qr_path = '$finalQrPath' WHERE id = " . $row['id']);
                 }
-                // ------------------------------------------------
         ?>
+            <!-- Sticker Layout (Single QR) -->
             <div class="sticker-strip">
+                <!-- QR Code ซ้าย -->
                 <div class="qr-box"><img src="<?php echo $finalQrPath; ?>" alt="QR"></div>
+                
+                <!-- ข้อมูล ตรงกลาง (ขยายเต็ม) -->
                 <div class="info-box">
                     <div class="asset-id"><?php echo $row['asset_id']; ?></div>
-                    <div class="dept-text">IT DEPARTMENT</div>
+                    <div class="dept-text">ระบบเเจงซ่อมอุปกรณ์ IT</div>
                 </div>
-                <div class="qr-box"><img src="<?php echo $finalQrPath; ?>" alt="QR"></div>
+                
+                <!-- ❌ QR Code ขวา (เอาออกแล้ว) -->
             </div>
         <?php 
             endwhile;

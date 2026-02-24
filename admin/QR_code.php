@@ -17,87 +17,8 @@ if (!isset($_SESSION['admin_logged_in'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --sidebar-width: 280px;
-            --primary-color: #4e54c8;
-            --bg-color: #f3f4f6;
-            --text-color: #334155;
-        }
 
-        body { 
-            font-family: 'Kanit', sans-serif; 
-            background-color: var(--bg-color); 
-            color: var(--text-color);
-            display: flex;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* === Main Content === */
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            padding: 2rem;
-        }
-
-        /* === Form Card Style === */
-        .form-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            border: 1px solid #f1f5f9;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .form-label {
-            font-weight: 500;
-            color: #334155;
-            margin-bottom: 0.5rem;
-            font-size: 0.95rem;
-        }
-
-        .form-control {
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            padding: 0.75rem 1rem;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        /* แก้ไข CSS ปุ่ม โดยใส่ !important เพื่อบังคับสี */
-        .btn-luxury {
-            background-color: #2563eb !important; /* บังคับสีน้ำเงิน */
-            color: white !important; /* บังคับตัวหนังสือขาว */
-            border-radius: 12px;
-            padding: 12px;
-            font-weight: 500;
-            border: none;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-        }
-
-        .btn-luxury:hover {
-            background-color: #1d4ed8 !important; /* สีตอนเอาเมาส์ชี้ */
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
-        }
-
-        .section-title {
-            position: relative;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -109,10 +30,10 @@ if (!isset($_SESSION['admin_logged_in'])) {
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="fw-bold mb-1">สร้าง QR Code ครุภัณฑ์</h2>
-                <p class="text-muted small">ระบบสร้าง QR Code สำหรับติดอุปกรณ์เพื่อแจ้งซ่อม</p>
+                <p class="text-muted small">สำหรับติดอุปกรณ์เพื่อแจ้งซ่อม</p>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small">
+                <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small text-nowrap">
                     <i class="bi bi-calendar-event me-2"></i> <?php echo date('d M Y'); ?>
                 </div>
             </div>
@@ -193,11 +114,10 @@ if (!isset($_SESSION['admin_logged_in'])) {
 </html>
 
 <script>
-    // ข้อมูลห้อง (Copy มาจากหน้า index.php เพื่อให้ข้อมูลตรงกันเป๊ะๆ)
     const roomData = {
-        "ตึก 14": ["1411", "1412", "1413", "1414", "1415", "1421", "1422", "1423", "1424", "1425", "1431", "1432", "1433", "1434", "1435", "1441", "1442", "1443", "1444", "1445"],
-        "ตึก 26": ["TC201", "TC202", "TC203", "TC204", "TC205"],
-        "Other": ["ห้อง IOT", "ห้อง IT 203", "อื่นๆ"]
+         "ตึก 14": ["1425", "1441", "1442", "1443"],
+         "ตึก 26": ["TC201", "TC202", "TC203", "TC204", "TC205","TC303"],
+         "Other": ["ห้อง IOT", "อื่นๆ"]
     };
 
     const buildingSelect = document.getElementById('adminBuildingSelect');

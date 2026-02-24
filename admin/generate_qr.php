@@ -11,6 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $serial_no = $_POST['serial_no'];
     $building = $_POST['building'];
     $room = $_POST['room'];
+	$location = $building . " " . $room;
     
 
     // --- 1. จัดการรูปภาพ (Image) ---
@@ -59,14 +60,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt = $conn->prepare("INSERT INTO equipment (asset_id, equipment_name, model_name, equipment_type, serial_no, location, image_path, qr_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("ssssssss", $asset_id, $equipment_name, $model_name, $equipment_type, $serial_no, $location, $targetFileDB, $qrFileDB);
     }
-    
-    $stmt->execute();
-    $stmt->close();
-    $conn->close();
+
     // --- 4. แจ้งผลลัพธ์ ---
     echo "<script>
         alert('บันทึกและสร้าง QR Code เรียบร้อย!');
-        window.location.href='manage_equipment.php?qrcode=" . urlencode($qrFileDB) . "&asset=" . urlencode($asset_id) . "';
+        window.location.href='QR_code.php';
     </script>";
+	$stmt->execute();
+    $stmt->close();
+    $conn->close();
 }
 ?>

@@ -1,8 +1,8 @@
 <?php
 // db_connect.php
-$servername = "localhost"; // หรือ IP เซิร์ฟเวอร์ของคุณ
-$username = "root";       // ชื่อผู้ใช้ฐานข้อมูล
-$password = "";           // รหัสผ่าน
+$servername = "localhost:3306"; // หรือ IP เซิร์ฟเวอร์ของคุณ
+$username = "klaoyai_repair_system";       // ชื่อผู้ใช้ฐานข้อมูล
+$password = "repair_system";           // รหัสผ่าน
 $dbname = "repair_system"; // ชื่อฐานข้อมูล
 
 // สร้างการเชื่อมต่อ

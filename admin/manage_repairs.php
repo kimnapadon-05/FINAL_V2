@@ -1,120 +1,192 @@
 <?php
 session_start();
 // ตรวจสอบสิทธิ์
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-if (!isset($_SESSION['admin_logged_in'])) {
-    header("Location: index.php");
-    exit();
-}
+if (!isset($_SESSION['admin_logged_in'])) { header("Location: index.php"); exit(); }
 
 include '../db_connect.php';
 
 // --- เรียกใช้ PHPMailer ---
-// ตรวจสอบ Path ให้ถูกต้อง (สมมติว่าคุณเก็บไว้ใน includes/PHPMailer/src/)
-require '../includes/PHPmailer/src/Exception.php';
-require '../includes/PHPmailer/src/PHPMailer.php';
-require '../includes/PHPmailer/src/SMTP.php';
+require_once __DIR__ . '/../includes/PHPmailer/src/Exception.php';
+require_once __DIR__ . '/../includes/PHPmailer/src/PHPMailer.php';
+require_once __DIR__ . '/../includes/PHPmailer/src/SMTP.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPmailer\PHPMailer;
+use PHPMailer\PHPmailer\Exception;
+use PHPMailer\PHPmailer\SMTP;
 
+// --- ฟังก์ชันย่อรูปภาพสำหรับอีเมล ---
+function resizeImageForMail($src, $maxWidth = 800) {
+    if (!file_exists($src)) return '';
+
+    [$width, $height, $type] = getimagesize($src);
+
+    if ($width <= $maxWidth) {
+        return $src; // ไม่ต้องย่อ
+    }
+
+    $ratio = $height / $width;
+    $newWidth  = $maxWidth;
+    $newHeight = (int)($maxWidth * $ratio);
+
+    $dst = imagecreatetruecolor($newWidth, $newHeight);
+
+    switch ($type) {
+        case IMAGETYPE_JPEG:
+            $srcImg = imagecreatefromjpeg($src);
+            break;
+        case IMAGETYPE_PNG:
+            $srcImg = imagecreatefrompng($src);
+            imagealphablending($dst, false);
+            imagesavealpha($dst, true);
+            break;
+        default:
+            return $src;
+    }
+
+    imagecopyresampled(
+        $dst, $srcImg,
+        0, 0, 0, 0,
+        $newWidth, $newHeight,
+        $width, $height
+    );
+
+    $newPath = dirname($src) . '/mail_' . basename($src);
+    imagejpeg($dst, $newPath, 85);
+
+    imagedestroy($srcImg);
+    imagedestroy($dst);
+
+    return $newPath;
+}
 // --- ฟังก์ชันส่งอีเมลด้วย PHPMailer ---
-function sendEmailNotification($to, $name, $tracking_id, $device) {
+function sendEmailNotification($to, $name, $tracking_id, $device, $location, $problem, $img_path = '')
+{
     $mail = new PHPMailer(true);
 
     try {
-        // ตั้งค่า Server (SMTP)
+        // SMTP
         $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';  // ใช้ Gmail SMTP
+        $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = '67319090008@lbtech.ac.th'; // 📧 ใส่อีเมลของคุณ
-        $mail->Password   = 'tkjb xped lwop vuzi'; // 🔑 ใส่ App Password 16 หลัก
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // หรือ ENCRYPTION_SMTPS
-        $mail->Port       = 587; // หรือ 465
+        $mail->Username   = '67319090008@lbtech.ac.th';
+        $mail->Password   = 'tkjb xped lwop vuzi';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
 
-        // ตั้งค่าผู้รับ-ผู้ส่ง
-        $mail->setFrom('67319090008@lbtech.ac.th', 'IT Service Support');
-        $mail->addAddress($to, $name); // ผู้รับ
+        // ผู้ส่ง / ผู้รับ
+        $mail->setFrom('67319090008@lbtech.ac.th', 'ระบบแจ้งซ่อมอุปกรณ์ IT');
+        $mail->addAddress($to, $name);
 
-        // ตั้งค่าเนื้อหา (รองรับภาษาไทย)
         $mail->CharSet = 'UTF-8';
         $mail->isHTML(true);
-        $mail->Subject = "แจ้งสถานะการซ่อม: เสร็จสิ้นเรียบร้อยแล้ว ($tracking_id)";
-        
-        $bodyContent = "
-        <div style='font-family: sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 10px; max-width: 600px;'>
-            <h2 style='color: #28a745;'>งานซ่อมเสร็จสิ้นแล้ว ✅</h2>
-            <p>เรียนคุณ <strong>$name</strong>,</p>
-            <p>งานแจ้งซ่อมของคุณ รหัส: <strong>$tracking_id</strong></p>
-            <p>อุปกรณ์: <strong>$device</strong></p>
-            <hr>
-            <p>เจ้าหน้าที่ได้ดำเนินการตรวจสอบและแก้ไขเรียบร้อยแล้ว สถานะปัจจุบันคือ <strong style='color:green'>เสร็จสิ้น</strong></p>
-            <p>คุณสามารถติดต่อรับอุปกรณ์คืนได้ที่แผนก IT ครับ</p>
-            <br>
-            <small style='color: #999;'>อีเมลนี้เป็นการแจ้งเตือนอัตโนมัติ กรุณาอย่าตอบกลับ</small>
-        </div>
-        ";
-        $mail->Body = $bodyContent;
+        $mail->Subject = "แจ้งสถานะงานซ่อม: เสร็จสิ้น ($tracking_id)";
 
+        /* ===== CID ===== */
+        $logoCID = 'org_logo';
+        $imgCID  = 'repair_image';
+
+        /* ===== โลโก้ ===== */
+        $logoPath = __DIR__ . '/../uploads/logo.png';
+        if (file_exists($logoPath)) {
+            $mail->addEmbeddedImage($logoPath, $logoCID, 'logo.png');
+        }
+
+        /* ===== HTML Email ===== */
+        $body = "
+        <div style='font-family:Kanit,sans-serif;max-width:600px;margin:auto;border:1px solid #ddd;border-radius:10px;padding:20px'>
+
+            <div style='text-align:center;margin-bottom:15px'>
+                <img src='cid:$logoCID' style='max-width:120px'><br>
+                <small style='color:#777'>ระบบแจ้งซ่อมอุปกรณ์ IT</small>
+            </div>
+
+            <h3 style='color:#198754'>แจ้งสถานะงานซ่อมอุปกรณ์</h3>
+
+            <p><b>ผู้แจ้ง:</b> {$name}</p>
+            <p><b>รหัสงาน:</b> {$tracking_id}</p>
+            <p><b>สถานะ:</b> <span style='color:green;font-weight:bold'>เสร็จสิ้น</span></p>
+
+            <hr>
+
+            <p><b>อุปกรณ์:</b> {$device}</p>
+            <p><b>สถานที่:</b> {$location}</p>
+            <p><b>อาการ:</b> {$problem}</p>
+        ";
+
+        /* ===== รูปงาน (ท้ายสุด) ===== */
+        if (!empty($img_path) && file_exists($img_path)) {
+            $body .= "
+            <hr>
+            <p><b>รูปประกอบ:</b></p>
+            <img src='cid:$imgCID'
+                 style='max-width:420px;width:100%;border-radius:8px;border:1px solid #ccc'>
+            ";
+            $mail->addEmbeddedImage($img_path, $imgCID, basename($img_path));
+        }
+
+        $body .= "
+            <hr>
+            <p>คุณสามารถติดต่อรับอุปกรณ์คืนได้ที่แผนกเทคโนโลยีคอมพิวเตอร์</p>
+            <small style='color:#999'>อีเมลนี้ส่งอัตโนมัติ กรุณาอย่าตอบกลับ</small>
+        </div>";
+
+        $mail->Body = $body;
         $mail->send();
         return true;
+
     } catch (Exception $e) {
-        // บันทึก Error ไว้ดู (ไม่แสดงหน้าเว็บเพื่อความสวยงาม)
-        error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
+        error_log('[MAIL ERROR] ' . $mail->ErrorInfo);
         return false;
     }
 }
 
-// --- Logic Update Status ---
+/* ================= Update Status ================= */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
+
     $new_status = $_POST['update_status'];
-    $req_id = $_POST['request_id'];
-    
+    $req_id     = (int)$_POST['request_id'];
+
     $sql = "UPDATE requests SET status = ?, updated_at = NOW()";
-    
-    if ($new_status == 'กำลังซ่อม') {
-        $sql .= ", repair_started_at = NOW()";
-    } elseif ($new_status == 'เสร็จสิ้น') {
-        $sql .= ", completed_at = NOW()";
-    }
-    
+    if ($new_status === 'กำลังซ่อม') $sql .= ", repair_started_at = NOW()";
+    if ($new_status === 'เสร็จสิ้น') $sql .= ", completed_at = NOW()";
     $sql .= " WHERE id = ?";
-    
+
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("si", $new_status, $req_id);
-    
-    if ($stmt->execute()) {
-        
-        // ถ้าสถานะเป็น "เสร็จสิ้น" -> เรียกฟังก์ชันส่งอีเมล
-        if ($new_status == 'เสร็จสิ้น') {
-            $sql_user = "SELECT reporter_email, reported_by, tracking_id, device_type FROM requests WHERE id = ?";
-            $stmt_user = $conn->prepare($sql_user);
-            $stmt_user->bind_param("i", $req_id);
-            $stmt_user->execute();
-            $result_user = $stmt_user->get_result();
-            $user_data = $result_user->fetch_assoc();
-            
-            if ($user_data && !empty($user_data['reporter_email'])) {
-                // เรียกใช้ฟังก์ชัน PHPMailer ด้านบน
-                sendEmailNotification(
-                    $user_data['reporter_email'],
-                    $user_data['reported_by'],
-                    $user_data['tracking_id'],
-                    $user_data['device_type']
-                );
-            }
-            $stmt_user->close();
-        }
 
-        header("Location: manage_repairs.php");
-        exit();
-    } else {
-        echo "<script>alert('Error: " . $conn->error . "');</script>";
+    if ($stmt->execute() && $new_status === 'เสร็จสิ้น') {
+
+        $q = $conn->prepare("
+            SELECT reporter_email, reported_by, tracking_id,
+                   device_type, building, room, problem_description, img_path
+            FROM requests WHERE id = ?
+        ");
+        $q->bind_param("i", $req_id);
+        $q->execute();
+        $r = $q->get_result()->fetch_assoc();
+
+        if ($r && !empty($r['reporter_email'])) {
+
+            $imgFull = '';
+            if (!empty($r['img_path'])) {
+                $imgFull = __DIR__ . '/../' . ltrim($r['img_path'], '/');
+            }
+
+            sendEmailNotification(
+                $r['reporter_email'],
+                $r['reported_by'],
+                $r['tracking_id'],
+                $r['device_type'],
+                $r['building'] . ' ' . $r['room'],
+                $r['problem_description'],
+                $imgFull
+            );
+        }
     }
-    $stmt->close();
-}
+
+    header("Location: manage_repairs.php?success=1");
+    exit();
+   }
 
 $sql = "SELECT * FROM requests ORDER BY created_at DESC";
 $result = $conn->query($sql);
@@ -124,25 +196,15 @@ $result = $conn->query($sql);
 <html lang="th">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Repairs</title>
-    <!-- ... (CSS เดิมของคุณ) ... -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     
-    <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; }
-        .main-content { margin-left: 280px; padding: 2rem; min-height: 100vh; }
-        @media (max-width: 992px) { .main-content { margin-left: 0; } }
-        .table-card { background: #ffffff; border-radius: 20px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
-        .status-pill { padding: 6px 16px; border-radius: 50px; font-size: 0.85rem; font-weight: 500; display: inline-block; min-width: 100px; text-align: center; }
-        
-        .info-label { font-size: 0.85rem; color: #94a3b8; margin-bottom: 2px; }
-        .info-value { font-weight: 500; color: #334155; font-size: 0.95rem; }
-        .info-group { margin-bottom: 1rem; }
-        .section-header { font-size: 0.9rem; font-weight: 600; color: #4e54c8; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
+    
 </head>
 <body>
 
@@ -152,9 +214,9 @@ $result = $conn->query($sql);
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h2 class="fw-bold mb-1">จัดการรายการแจ้งซ่อม</h2>
-                <p class="text-muted small">Manage Repair Requests</p>
+                <p class="text-muted small">รายการแจ้งซ่อมทั้งหมดในระบบ</p>
             </div>
-            <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small">
+            <div class="bg-white px-3 py-2 rounded-3 border shadow-sm text-muted small text-nowrap">
                 <i class="bi bi-calendar-event me-2"></i> <?php echo date('d M Y'); ?>
             </div>
         </div>
@@ -340,7 +402,18 @@ $result = $conn->query($sql);
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#manageTable').DataTable({ "language": { "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json" }, "order": [[ 0, "desc" ]] });
+            $('#manageTable').DataTable({
+    language: {
+        url: "//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json"
+    },
+    order: [[ 3, "desc" ]], // ล่าสุดก่อน
+    columnDefs: [
+        {
+            targets: -1,     // คอลัมน์สุดท้าย (จัดการ)
+            orderable: false
+        }
+    ]
+});
             $(document).on('click', '.btn-view-case', function() {
                 const b = $(this);
                 $('#modalRequestId').val(b.data('id'));
